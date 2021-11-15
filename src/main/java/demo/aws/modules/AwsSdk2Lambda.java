@@ -2,8 +2,7 @@ package demo.aws.modules;
 
 import java.util.List;
 
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.lambda.LambdaClient;
 import software.amazon.awssdk.services.lambda.model.FunctionConfiguration;
@@ -14,10 +13,10 @@ public class AwsSdk2Lambda {
 
 	private LambdaClient client;
 	
-	public AwsSdk2Lambda(AwsCredentials credentials, Region region) {
+	public AwsSdk2Lambda(AwsCredentialsProvider credentialsProvider, Region region) {
 		
 		this.client = LambdaClient.builder()
-				  .credentialsProvider(StaticCredentialsProvider.create(credentials))
+				  .credentialsProvider(credentialsProvider)
 				  .region(region)
 				  .build();
 	}
