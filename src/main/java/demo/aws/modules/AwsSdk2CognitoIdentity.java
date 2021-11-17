@@ -13,11 +13,11 @@ import software.amazon.awssdk.services.cognitoidentity.model.ListIdentitiesRespo
 import software.amazon.awssdk.services.cognitoidentity.model.ListIdentityPoolsRequest;
 import software.amazon.awssdk.services.cognitoidentity.model.ListIdentityPoolsResponse;
 
-public class AwsSdk2Cognito {
+public class AwsSdk2CognitoIdentity {
 
 	private CognitoIdentityClient client;
 	
-	public AwsSdk2Cognito(AwsCredentialsProvider credentialsProvider, Region region) {
+	public AwsSdk2CognitoIdentity(AwsCredentialsProvider credentialsProvider, Region region) {
 		
 		this.client = CognitoIdentityClient.builder()
 				  .credentialsProvider(credentialsProvider)
