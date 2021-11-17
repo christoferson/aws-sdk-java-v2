@@ -1,14 +1,28 @@
 package demo.aws.modules;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.cognitoidentity.model.CognitoIdentityException;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminAddUserToGroupRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminDeleteUserRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.DeliveryMediumType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUserPoolsRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUserPoolsResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.MessageActionType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserPoolDescriptionType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UserType;
 
 public class AwsSdk2Cognito {
 
@@ -36,34 +50,38 @@ public class AwsSdk2Cognito {
                 System.out.println(String.format("%s %s", element.id(), element.name()));
             }
 
-        } catch(CognitoIdentityException e) {
+        } catch(CognitoIdentityProviderException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
         }
         
 	}
-/*	
-	public void identityPoolListUsers(String poolId) {
 
+	public Set<String> userPoolListUsers(String poolId) {
+
+		Set<String> users = new TreeSet<>();
+		
         try {
         	
-        	ListIdentitiesRequest request = ListIdentitiesRequest.builder()
-        			.identityPoolId(poolId)
-        			.maxResults(60)
+        	ListUsersRequest request = ListUsersRequest.builder()
+        			.userPoolId(poolId)
+        			.limit(60)
         			.build();
-        	ListIdentitiesResponse result = client.listIdentities(request);
-            List<IdentityDescription> list = result.identities();
+        	ListUsersResponse result = client.listUsers(request);
+            List<UserType> list = result.users();
 
-            for (IdentityDescription element : list) {
-                System.out.println(String.format("%s %s", element.identityId(), element.getValueForField("name", String.class)));
+            for (UserType element : list) {
+            	
+                System.out.println(String.format("%s %s", element.username(), element.userStatus()));
+                users.add(element.username());
             }
 
-        } catch(CognitoIdentityException e) {
+        } catch(CognitoIdentityProviderException e) {
             System.err.println(e.getMessage());
-            System.exit(1);
         }
+
+        return users;
         
 	}
-	*/
+	
 	
 }
