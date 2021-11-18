@@ -1,8 +1,8 @@
 package demo.aws.modules;
 
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -56,9 +56,9 @@ public class AwsSdk2Cognito {
         
 	}
 
-	public Set<String> userPoolListUsers(String poolId) {
+	public Map<String, String> userPoolListUsers(String poolId) {
 
-		Set<String> users = new TreeSet<>();
+		Map<String, String> users = new TreeMap<>();
 		
         try {
         	
@@ -72,7 +72,7 @@ public class AwsSdk2Cognito {
             for (UserType element : list) {
             	
                 System.out.println(String.format("%s %s", element.username(), element.userStatus()));
-                users.add(element.username());
+                users.put(element.username(), element.userStatusAsString());
             }
 
         } catch(CognitoIdentityProviderException e) {
@@ -120,7 +120,30 @@ public class AwsSdk2Cognito {
 		}
 
 	}
+	
+	public void userPoolNewUser(String userPoolId, String name, String email, String password) {
 
+		try {
+
+			AttributeType userAttrs = AttributeType.builder().name("email").value(email).build();
+			AttributeType userAttrs2 = AttributeType.builder().name("email_verified").value("true").build();
+
+			AdminCreateUserRequest userRequest = AdminCreateUserRequest.builder().userPoolId(userPoolId).username(name)
+					//.temporaryPassword(password)
+					.userAttributes(userAttrs, userAttrs2)
+					//.messageAction(MessageActionType.SUPPRESS)
+					.build();
+
+			AdminCreateUserResponse response = client.adminCreateUser(userRequest);
+			System.out.println(String.format("[NewUser] User=%s Status=%s", response.user().username(), response.user().userStatus()));
+
+		} catch (CognitoIdentityProviderException e) {
+			System.err.println(e.awsErrorDetails().errorMessage());
+		}
+		
+
+	}
+	
 	
 	
 }
