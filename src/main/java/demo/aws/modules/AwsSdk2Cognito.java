@@ -104,6 +104,23 @@ public class AwsSdk2Cognito {
 
 	}
 	
+	public void userPoolDeleteUser(String userPoolId, String name) {
+
+		try {
+
+			AdminDeleteUserRequest userRequest = AdminDeleteUserRequest.builder().userPoolId(userPoolId)
+					.username(name)
+					.build();
+
+			client.adminDeleteUser(userRequest);
+			System.out.println(String.format("[DeleteUser] User=%s deleted.", name));
+
+		} catch (CognitoIdentityProviderException e) {
+			System.err.println(e.awsErrorDetails().errorMessage());
+		}
+
+	}
+
 	
 	
 }
