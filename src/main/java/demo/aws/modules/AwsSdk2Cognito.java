@@ -83,6 +83,41 @@ public class AwsSdk2Cognito {
         
 	}
 	
+	public Map<String, String> userPoolListUsersAll(String poolId) {
+
+		Map<String, String> users = new TreeMap<>();
+		
+		String paginationToken = null;
+		boolean next = false;
+		do {
+        try {
+        	
+        	ListUsersRequest request = ListUsersRequest.builder()
+        			.userPoolId(poolId)
+        			.limit(60)
+        			.paginationToken(paginationToken)
+        			.build();
+        	ListUsersResponse result = client.listUsers(request);
+            List<UserType> list = result.users();
+
+            for (UserType element : list) {
+            	
+                System.out.println(String.format("%s %s", element.username(), element.userStatus()));
+                users.put(element.username(), element.userStatusAsString());
+            }
+            
+            paginationToken = result.paginationToken();
+            next = paginationToken != null;
+
+        } catch(CognitoIdentityProviderException e) {
+            System.err.println(e.getMessage());
+        }
+		} while (next);
+
+        return users;
+        
+	}
+	
 	public String userPoolGetUser(String userPoolId, String name) {
 
 		try {
@@ -121,8 +156,10 @@ public class AwsSdk2Cognito {
 
 	}
 	
-	public void userPoolNewUser(String userPoolId, String name, String email, String password) {
+	public boolean userPoolNewUser(String userPoolId, String name, String email, String password) {
 
+		boolean success = false;
+		
 		try {
 
 			AttributeType userAttrs = AttributeType.builder().name("email").value(email).build();
@@ -136,14 +173,50 @@ public class AwsSdk2Cognito {
 
 			AdminCreateUserResponse response = client.adminCreateUser(userRequest);
 			System.out.println(String.format("[NewUser] User=%s Status=%s", response.user().username(), response.user().userStatus()));
-
+			success = true;
 		} catch (CognitoIdentityProviderException e) {
 			System.err.println(e.awsErrorDetails().errorMessage());
 		}
 		
+		return success;
 
 	}
 	
+	public  void userPoolAddUserToGroup(String userPoolId, String name, String groupName) {
+	
+		try {
+
+			AdminAddUserToGroupRequest userRequest = AdminAddUserToGroupRequest.builder().userPoolId(userPoolId)
+					.username(name)
+					.groupName(groupName)
+					.build();
+
+			client.adminAddUserToGroup(userRequest);
+			System.out.println(String.format("[AddUserToGroup] User=%s added to Group=%s", name, groupName));
+
+		} catch (CognitoIdentityProviderException e) {
+			System.err.println(e.awsErrorDetails().errorMessage());
+		}
+	}
+
+	public void userPoolResendMail(String userPoolId, String name) {
+
+		try {
+
+			AdminCreateUserRequest userRequest = AdminCreateUserRequest.builder().userPoolId(userPoolId)
+					.username(name)
+					.messageAction(MessageActionType.RESEND)
+					.desiredDeliveryMediums(DeliveryMediumType.EMAIL)
+					.build();
+
+			AdminCreateUserResponse response = client.adminCreateUser(userRequest);
+			System.out.println(String.format("[ResendMail] User=%s Status=%s", response.user().username(), response.user().userStatus()));
+			
+		} catch (CognitoIdentityProviderException e) {
+			System.err.println(e.awsErrorDetails().errorMessage());
+		}
+
+	}
 	
 	
 }
