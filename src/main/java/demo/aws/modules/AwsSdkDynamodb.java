@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputDescription;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
+import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.TableDescription;
 
 public class AwsSdkDynamodb {
@@ -97,6 +99,29 @@ public class AwsSdkDynamodb {
 		System.out.println("\nDone!");
 
 	}
+	
+    public void tableScan(String tableName) {
+        try {
+        
+            ScanRequest scanRequest = ScanRequest.builder()
+                    .tableName(tableName)
+                    .build();
+
+            ScanResponse response = client.scan(scanRequest);
+            for (Map<String, AttributeValue> item : response.items()) {
+//                Set<String> keys = item.keySet();
+//                for (String key : keys) {
+//                    System.out.println ("The key name is "+key +"\n" );
+//                    System.out.println("The value is "+item.get(key).s());
+//                }
+                System.out.println(item);
+            }
+
+        } catch (DynamoDbException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 	
 	
 	public void itemRetrieve(String tableName, String partitionId, String sortId) {
@@ -243,16 +268,7 @@ public class AwsSdkDynamodb {
 		}
     }
     
-    public void tableScan(String tableName) {
-    	System.out.println("Scan Table");
-    	ScanRequest scanRequest = new ScanRequest()
-    	    .withTableName(tableName);
 
-    	ScanResult result = client.scan(scanRequest);
-    	for (Map<String, AttributeValue> item : result.getItems()){
-    		System.out.println(item);
-    	}
-    }
     
     public void describeDymamoDBTable(String tableName) {
 
