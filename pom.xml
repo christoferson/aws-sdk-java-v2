@@ -45,7 +45,17 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>lambda</artifactId>
           </dependency>
-          
+
+          <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ses</artifactId>
+          </dependency>
+
+          <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>dynamodb</artifactId>
+          </dependency>
+                              
           <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>cognitoidentity</artifactId>
@@ -84,5 +94,24 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.25</version>
         </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.5.5</version>
+        </dependency>        
+        
+        
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.1.0</version>
+		</dependency>
+        
     </dependencies>
 </project>
