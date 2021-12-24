@@ -1,13 +1,18 @@
 package demo.aws.modules;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
+import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputDescription;
@@ -93,28 +98,38 @@ public class AwsSdkDynamodb {
 
 	}
 	
-	/*		
-	public void itemRetrieve(String tableName, String keyRegionId, String keyPlayerId) {
-        Table table = dynamoDB.getTable(tableName);
+	
+	public void itemRetrieve(String tableName, String partitionId, String sortId) {
+ 
+        HashMap<String,AttributeValue> keyToGet = new HashMap<String, AttributeValue>();
+
+        keyToGet.put("Region", AttributeValue.builder().s("US").build());
+
+        GetItemRequest request = GetItemRequest.builder()
+                .key(keyToGet)
+                .tableName(tableName)
+                .build();
 
         try {
-        	GetItemSpec i = new GetItemSpec();
-        	i.withPrimaryKey("Region", keyRegionId, "PlayerID", keyPlayerId);
-            //Item item = table.getItem("Region", keyRegionId, "PlayerID", keyPlayerId, "PlayerID", null);
-        	Item item = table.getItem("Region", keyRegionId, "PlayerID", keyPlayerId, null, null);
-            
-            System.out.println("Printing item after retrieving it....");
-            //System.out.println(item.toJSONPretty());
-            System.out.println(item);
+            Map<String, AttributeValue> returnedItem = client.getItem(request).item();
 
-        }
-        catch (Exception e) {
-            System.err.println("GetItem failed.");
+            if (returnedItem != null) {
+                Set<String> keys = returnedItem.keySet();
+                System.out.println("Amazon DynamoDB table attributes: \n");
+
+                for (String key1 : keys) {
+                    System.out.format("%s: %s\n", key1, returnedItem.get(key1).toString());
+                }
+            } else {
+                System.out.format("No item found with the key %s!\n", "sss");
+            }
+        } catch (DynamoDbException e) {
             System.err.println(e.getMessage());
+            System.exit(1);
         }
 
     }
-	
+/*	
     public void itemRegister(String tableName, String keyRegionId, String keyPlayerId) {
 
         Table table = dynamoDB.getTable(tableName);
