@@ -5,9 +5,13 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
+import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
+import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputDescription;
+import software.amazon.awssdk.services.dynamodb.model.TableDescription;
 
 public class AwsSdkDynamodb {
 
@@ -54,21 +58,42 @@ public class AwsSdkDynamodb {
     }
  
 	
-/*	
+
 	public void tableDescribe(String tableName) {
 
-        System.out.println("Describing " + tableName);
+		DescribeTableRequest request = DescribeTableRequest.builder().tableName(tableName).build();
 
-        TableDescription tableDescription = dynamoDB.getTable(tableName).describe();
-        System.out.format(
-            "Name: %s:\n" + "Status: %s \n" + "Provisioned Throughput (read capacity units/sec): %d \n"
-                + "Provisioned Throughput (write capacity units/sec): %d \n",
-            tableDescription.getTableName(), tableDescription.getTableStatus(),
-            tableDescription.getProvisionedThroughput().getReadCapacityUnits(),
-            tableDescription.getProvisionedThroughput().getWriteCapacityUnits());
-    }
+		try {
+			TableDescription tableInfo = client.describeTable(request).table();
+
+			if (tableInfo != null) {
+				System.out.format("Table Name  : %s\n", tableInfo.tableName());
+				System.out.format("Table ARN   : %s\n", tableInfo.tableArn());
+				System.out.format("Status      : %s\n", tableInfo.tableStatus());
+				System.out.format("Item count  : %d\n", tableInfo.itemCount().longValue());
+				System.out.format("Size (bytes): %d\n", tableInfo.tableSizeBytes().longValue());
+
+				ProvisionedThroughputDescription throughputInfo = tableInfo.provisionedThroughput();
+				System.out.println("Throughput");
+				System.out.format("  Read Capacity  : %d\n", throughputInfo.readCapacityUnits().longValue());
+				System.out.format("  Write Capacity : %d\n", throughputInfo.writeCapacityUnits().longValue());
+
+				List<AttributeDefinition> attributes = tableInfo.attributeDefinitions();
+				System.out.println("Attributes");
+
+				for (AttributeDefinition a : attributes) {
+					System.out.format("  %s (%s)\n", a.attributeName(), a.attributeType());
+				}
+			}
+		} catch (DynamoDbException e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+		System.out.println("\nDone!");
+
+	}
 	
-	
+	/*		
 	public void itemRetrieve(String tableName, String keyRegionId, String keyPlayerId) {
         Table table = dynamoDB.getTable(tableName);
 
