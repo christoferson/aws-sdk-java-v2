@@ -137,36 +137,30 @@ public class AwsSdkDynamodb {
         }
 		
     }
-	
-	
-	public void itemRetrieve(String tableName, String partitionId, String sortId) {
- 
-        HashMap<String,AttributeValue> keyToGet = new HashMap<String, AttributeValue>();
 
-        keyToGet.put("Region", AttributeValue.builder().s("US").build());
+	public void itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
+ 
+        HashMap<String,AttributeValue> itemKey = new HashMap<String, AttributeValue>();
+        itemKey.put("Region", AttributeValue.builder().s(partitionKey).build());
+        itemKey.put("CharacterName", AttributeValue.builder().s(sortKey).build());
 
         GetItemRequest request = GetItemRequest.builder()
-                .key(keyToGet)
+                .key(itemKey)
                 .tableName(tableName)
                 .build();
 
-        try {
-            Map<String, AttributeValue> returnedItem = client.getItem(request).item();
-
-            if (returnedItem != null) {
-                Set<String> keys = returnedItem.keySet();
-                System.out.println("Amazon DynamoDB table attributes: \n");
-
-                for (String key1 : keys) {
-                    System.out.format("%s: %s\n", key1, returnedItem.get(key1).toString());
-                }
-            } else {
-                System.out.format("No item found with the key %s!\n", "sss");
-            }
-        } catch (DynamoDbException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
+        Map<String, AttributeValue> item = client.getItem(request).item();
+        if (item == null) {
+        	System.out.format("No item found with the key %s!\n", "sss");
+        	return;
         }
+
+        Set<String> keys = item.keySet();
+        System.out.print("Amazon DynamoDB table attributes: \n");
+        for (String key1 : keys) {
+            System.out.format("%s: %s\n", key1, item.get(key1).toString());
+        }
+
 
     }
 /*	
