@@ -192,19 +192,21 @@ public class AwsSdkDynamodb {
 
     }
 	
-    public void itemRegister(String tableName, String keyRegionId, String keyPlayerId) throws ResourceNotFoundException, DynamoDbException {
+	// ConditionalCheckFailedException - When duplicate
+    public void itemRegister(String tableName, String partitionKey, String sortKey, String race, String profession) throws ResourceNotFoundException, DynamoDbException {
 
         HashMap<String,AttributeValue> itemValues = new HashMap<String,AttributeValue>();
 
-        itemValues.put("Region", AttributeValue.builder().s(keyRegionId).build());
-        itemValues.put("CharacterName", AttributeValue.builder().s(keyPlayerId).build());
-        itemValues.put("Profession", AttributeValue.builder().s("Hunter").build());
-        itemValues.put("Race", AttributeValue.builder().s("Elf").build());
+        itemValues.put("Region", AttributeValue.builder().s(partitionKey).build());
+        itemValues.put("CharacterName", AttributeValue.builder().s(sortKey).build());
+        itemValues.put("Profession", AttributeValue.builder().s(profession).build());
+        itemValues.put("Race", AttributeValue.builder().s(race).build());
         itemValues.put("Version", AttributeValue.builder().s("1").build());
 
         PutItemRequest request = PutItemRequest.builder()
                 .tableName(tableName)
                 .item(itemValues)
+                .conditionExpression("attribute_not_exists(CharacterName)")
                 .build();
 
         PutItemResponse response = client.putItem(request);
