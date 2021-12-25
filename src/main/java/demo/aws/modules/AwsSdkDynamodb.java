@@ -16,8 +16,11 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputDescription;
+import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
+import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.TableDescription;
@@ -163,26 +166,29 @@ public class AwsSdkDynamodb {
 
 
     }
-/*	
-    public void itemRegister(String tableName, String keyRegionId, String keyPlayerId) {
+	
+    public void itemRegister(String tableName, String keyRegionId, String keyPlayerId) throws ResourceNotFoundException, DynamoDbException {
 
-        Table table = dynamoDB.getTable(tableName);
-        try {
+        HashMap<String,AttributeValue> itemValues = new HashMap<String,AttributeValue>();
 
-            Item item = new Item()
-            		.withPrimaryKey("Region", keyRegionId, "PlayerID", keyPlayerId)
-            		.withString("Level", "1");
-            // Without the condition, existing record will be overwritten
-            table.putItem(item, "attribute_not_exists(PlayerID)", null, null);
+        itemValues.put("Region", AttributeValue.builder().s(keyRegionId).build());
+        itemValues.put("CharacterName", AttributeValue.builder().s(keyPlayerId).build());
+        itemValues.put("Profession", AttributeValue.builder().s("Hunter").build());
+        itemValues.put("Race", AttributeValue.builder().s("Elf").build());
+        itemValues.put("Version", AttributeValue.builder().s("1").build());
 
-            System.out.println("Registered: " + item);
+        PutItemRequest request = PutItemRequest.builder()
+                .tableName(tableName)
+                .item(itemValues)
+                .build();
 
-        } catch (Exception e) {
-            System.err.println("Create items failed.");
-            System.err.println(e.getMessage());
-        }
+        PutItemResponse response = client.putItem(request);
+        System.out.println("" + response);
 
     }
+    
+/*	
+
     
     // What if attribute already exists // How to remove attribute
     public void itemUpdateAddNewAttribute(String tableName, String keyRegionId, String keyPlayerId) {
