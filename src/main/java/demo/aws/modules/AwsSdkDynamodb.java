@@ -68,63 +68,46 @@ public class AwsSdkDynamodb {
  
 	
 
-	public void tableDescribe(String tableName) {
+	public void tableDescribe(String tableName) throws DynamoDbException {
 
 		DescribeTableRequest request = DescribeTableRequest.builder().tableName(tableName).build();
-
-		try {
-			TableDescription tableInfo = client.describeTable(request).table();
-
-			if (tableInfo != null) {
-				System.out.format("Table Name  : %s\n", tableInfo.tableName());
-				System.out.format("Table ARN   : %s\n", tableInfo.tableArn());
-				System.out.format("Status      : %s\n", tableInfo.tableStatus());
-				System.out.format("Item count  : %d\n", tableInfo.itemCount().longValue());
-				System.out.format("Size (bytes): %d\n", tableInfo.tableSizeBytes().longValue());
-
-				ProvisionedThroughputDescription throughputInfo = tableInfo.provisionedThroughput();
-				System.out.println("Throughput");
-				System.out.format("  Read Capacity  : %d\n", throughputInfo.readCapacityUnits().longValue());
-				System.out.format("  Write Capacity : %d\n", throughputInfo.writeCapacityUnits().longValue());
-
-				List<AttributeDefinition> attributes = tableInfo.attributeDefinitions();
-				System.out.println("Attributes");
-
-				for (AttributeDefinition a : attributes) {
-					System.out.format("  %s (%s)\n", a.attributeName(), a.attributeType());
-				}
-			}
-		} catch (DynamoDbException e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
+		
+		TableDescription tableInfo = client.describeTable(request).table();
+		if (tableInfo == null) {
+			return;
 		}
-		System.out.println("\nDone!");
+		
+		System.out.format("Table Name  : %s\n", tableInfo.tableName());
+		System.out.format("Table ARN   : %s\n", tableInfo.tableArn());
+		System.out.format("Status      : %s\n", tableInfo.tableStatus());
+		System.out.format("Item count  : %d\n", tableInfo.itemCount().longValue());
+		System.out.format("Size (bytes): %d\n", tableInfo.tableSizeBytes().longValue());
 
+		ProvisionedThroughputDescription throughputInfo = tableInfo.provisionedThroughput();
+		System.out.println("Throughput");
+		System.out.format("  Read Capacity  : %d\n", throughputInfo.readCapacityUnits().longValue());
+		System.out.format("  Write Capacity : %d\n", throughputInfo.writeCapacityUnits().longValue());
+
+		List<AttributeDefinition> attributes = tableInfo.attributeDefinitions();
+		System.out.println("Attributes");
+
+		for (AttributeDefinition a : attributes) {
+			System.out.format("  %s (%s)\n", a.attributeName(), a.attributeType());
+		}
+	
 	}
 	
-//	{Profession=AttributeValue(S=Hunter), Race=AttributeValue(S=Human), CharacterName=AttributeValue(S=Name1), Region=AttributeValue(S=US)}
-//	{Profession=AttributeValue(S=Hunter), Race=AttributeValue(S=Human), CharacterName=AttributeValue(S=Name2), Region=AttributeValue(S=TW)}
-    public void tableScan(String tableName) {
-        try {
-        
-            ScanRequest scanRequest = ScanRequest.builder()
+    public void tableScan(String tableName) throws DynamoDbException {
+ 
+    	ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(tableName)
                     .build();
 
-            ScanResponse response = client.scan(scanRequest);
-            for (Map<String, AttributeValue> item : response.items()) {
-//                Set<String> keys = item.keySet();
-//                for (String key : keys) {
-//                    System.out.println ("The key name is "+key +"\n" );
-//                    System.out.println("The value is "+item.get(key).s());
-//                }
-                System.out.println(item);
-            }
-
-        } catch (DynamoDbException e) {
-            e.printStackTrace();
-            System.exit(1);
+        ScanResponse response = client.scan(scanRequest);
+        for (Map<String, AttributeValue> item : response.items()) {
+            System.out.println(item);
         }
+
     }
     
     public void itemQuery(String tableName) throws DynamoDbException {
