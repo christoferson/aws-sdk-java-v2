@@ -113,7 +113,7 @@ public class AwsSdkDynamodb {
 
     }
     
-    public void itemQuery(String tableName) throws DynamoDbException {
+    public void itemQuery(String tableName, String regionKey) throws DynamoDbException {
 
         // Set up an alias for the partition key name in case it's a reserved word
         HashMap<String,String> attrNames = new HashMap<String,String>();
@@ -121,13 +121,11 @@ public class AwsSdkDynamodb {
 
         // Set up mapping of the partition name with the value
         HashMap<String, AttributeValue> attrValues = new HashMap<String,AttributeValue>();
-        attrValues.put(":"+"v_region", AttributeValue.builder().s("US").build());
-        attrValues.put(":"+"character_name", AttributeValue.builder().s("Name1").build());
+        attrValues.put(":"+"v_region", AttributeValue.builder().s(regionKey).build());
         
         QueryRequest queryReq = QueryRequest.builder()
                 .tableName(tableName)
-                .keyConditionExpression("#key_region = :v_region and CharacterName = :character_name")
-                //.keyConditionExpression("#key_region = :v_region")
+                .keyConditionExpression("#key_region = :v_region")
                 .expressionAttributeNames(attrNames)
                 .expressionAttributeValues(attrValues)
                 .build();
@@ -140,6 +138,33 @@ public class AwsSdkDynamodb {
         }
 		
     }
+    
+    public void itemQuery(String tableName, String regionKey, String sortKey) throws DynamoDbException {
+
+        // Set up an alias for the partition key name in case it's a reserved word
+        HashMap<String,String> attrNames = new HashMap<String,String>();
+        attrNames.put("#key_region", "Region");
+
+        // Set up mapping of the partition name with the value
+        HashMap<String, AttributeValue> attrValues = new HashMap<String,AttributeValue>();
+        attrValues.put(":"+"v_region", AttributeValue.builder().s(regionKey).build());
+        attrValues.put(":"+"character_name", AttributeValue.builder().s(sortKey).build());
+        
+        QueryRequest queryReq = QueryRequest.builder()
+                .tableName(tableName)
+                .keyConditionExpression("#key_region = :v_region and CharacterName = :character_name")
+                .expressionAttributeNames(attrNames)
+                .expressionAttributeValues(attrValues)
+                .build();
+
+        QueryResponse response = client.query(queryReq);
+        System.out.println(String.format("Query.Result.Count: %s", response.count()));
+        List<Map<String, AttributeValue>> items = response.items();
+        for (Map<String, AttributeValue> item : items) {
+        	System.out.println(String.format("%s", item));
+        }
+		
+    }    
 
 	public void itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
  
