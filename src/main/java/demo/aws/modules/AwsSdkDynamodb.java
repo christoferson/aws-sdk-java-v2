@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputDescription;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.TableDescription;
@@ -100,6 +102,8 @@ public class AwsSdkDynamodb {
 
 	}
 	
+//	{Profession=AttributeValue(S=Hunter), Race=AttributeValue(S=Human), CharacterName=AttributeValue(S=Name1), Region=AttributeValue(S=US)}
+//	{Profession=AttributeValue(S=Hunter), Race=AttributeValue(S=Human), CharacterName=AttributeValue(S=Name2), Region=AttributeValue(S=TW)}
     public void tableScan(String tableName) {
         try {
         
@@ -121,6 +125,34 @@ public class AwsSdkDynamodb {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+    
+    public void itemQuery(String tableName) throws DynamoDbException {
+
+        // Set up an alias for the partition key name in case it's a reserved word
+        HashMap<String,String> attrNames = new HashMap<String,String>();
+        attrNames.put("#key_region", "Region");
+
+        // Set up mapping of the partition name with the value
+        HashMap<String, AttributeValue> attrValues = new HashMap<String,AttributeValue>();
+        attrValues.put(":"+"v_region", AttributeValue.builder().s("US").build());
+        attrValues.put(":"+"character_name", AttributeValue.builder().s("Name1").build());
+        
+        QueryRequest queryReq = QueryRequest.builder()
+                .tableName(tableName)
+                .keyConditionExpression("#key_region = :v_region and CharacterName = :character_name")
+                //.keyConditionExpression("#key_region = :v_region")
+                .expressionAttributeNames(attrNames)
+                .expressionAttributeValues(attrValues)
+                .build();
+
+        QueryResponse response = client.query(queryReq);
+        System.out.println(String.format("Query.Result.Count: %s", response.count()));
+        List<Map<String, AttributeValue>> items = response.items();
+        for (Map<String, AttributeValue> item : items) {
+        	System.out.println(String.format("%s", item));
+        }
+		
     }
 	
 	
@@ -230,28 +262,7 @@ public class AwsSdkDynamodb {
         }
     }
     
-    public void itemQuery(String tableName) {
 
-		Table table = dynamoDB.getTable(tableName);
-
-		QuerySpec spec = new QuerySpec()
-				.withKeyConditionExpression("Region = :v_id")
-				.withValueMap(new ValueMap().withString(":v_id", "Conan"));
-				//.withFilterExpression("Region = :v_region and PlayerID = :v_id")
-				//.withValueMap(new ValueMap().withString(":v_id", "Conan").withString("v_region", "US"));
-
-		ItemCollection<QueryOutcome> items = table.query(spec);
-
-		int count = 0;
-		for (Item item : items) {
-			System.out.println(item);
-			count++;
-		}
-		if (count == 0) {
-			System.out.println("No Matches");
-		}
-		
-    }
     
     public void executePartiQL(String partiQLString) {
 
