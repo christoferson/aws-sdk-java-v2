@@ -8,8 +8,10 @@ import java.util.Set;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
@@ -24,6 +26,7 @@ import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.TableDescription;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
 public class AwsSdkDynamodb {
 
@@ -166,7 +169,7 @@ public class AwsSdkDynamodb {
 		
     }    
 
-	public void itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
+	public Map<String, AttributeValue> itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
  
         HashMap<String,AttributeValue> itemKey = new HashMap<String, AttributeValue>();
         itemKey.put("Region", AttributeValue.builder().s(partitionKey).build());
@@ -180,7 +183,7 @@ public class AwsSdkDynamodb {
         Map<String, AttributeValue> item = client.getItem(request).item();
         if (item == null) {
         	System.out.format("No item found with the key %s!\n", "sss");
-        	return;
+        	return null;
         }
 
         Set<String> keys = item.keySet();
@@ -189,31 +192,32 @@ public class AwsSdkDynamodb {
             System.out.format("%s: %s\n", key1, item.get(key1).toString());
         }
 
+        return item;
 
     }
 	
 	// ConditionalCheckFailedException - When duplicate
     public void itemRegister(String tableName, String partitionKey, String sortKey, String race, String profession) throws ResourceNotFoundException, DynamoDbException {
 
-        HashMap<String,AttributeValue> itemValues = new HashMap<String,AttributeValue>();
+		HashMap<String, AttributeValue> itemValues = new HashMap<String, AttributeValue>();
 
-        itemValues.put("Region", AttributeValue.builder().s(partitionKey).build());
-        itemValues.put("CharacterName", AttributeValue.builder().s(sortKey).build());
-        itemValues.put("Profession", AttributeValue.builder().s(profession).build());
-        itemValues.put("Race", AttributeValue.builder().s(race).build());
-        itemValues.put("Version", AttributeValue.builder().s("1").build());
+		itemValues.put("Region", AttributeValue.builder().s(partitionKey).build());
+		itemValues.put("CharacterName", AttributeValue.builder().s(sortKey).build());
+		itemValues.put("Profession", AttributeValue.builder().s(profession).build());
+		itemValues.put("Race", AttributeValue.builder().s(race).build());
+		itemValues.put("Version", AttributeValue.builder().s("1").build());
 
-        PutItemRequest request = PutItemRequest.builder()
-                .tableName(tableName)
-                .item(itemValues)
-                .conditionExpression("attribute_not_exists(CharacterName)")
-                .build();
+		PutItemRequest request = PutItemRequest.builder()
+				.tableName(tableName)
+				.item(itemValues)
+				.conditionExpression("attribute_not_exists(CharacterName)")
+				.build();
 
-        PutItemResponse response = client.putItem(request);
-        System.out.println("" + response);
+		PutItemResponse response = client.putItem(request);
+		System.out.println("" + response);
 
     }
-    
+
 /*	
 
     
