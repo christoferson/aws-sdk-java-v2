@@ -218,6 +218,31 @@ public class AwsSdkDynamodb {
 
     }
 
+    public void itemEdit(String tableName, String partitionKey, String sortKey, String race, String profession, String version) throws ResourceNotFoundException, DynamoDbException {
+
+		HashMap<String, AttributeValue> itemKey = new HashMap<String, AttributeValue>();
+		itemKey.put("Region", AttributeValue.builder().s(partitionKey).build());
+		itemKey.put("CharacterName", AttributeValue.builder().s(sortKey).build());
+
+		String newVersion = String.valueOf(Long.valueOf(version) + 1);
+		HashMap<String, AttributeValueUpdate> updatedValues = new HashMap<String, AttributeValueUpdate>();
+		updatedValues.put("Version", AttributeValueUpdate.builder().value(AttributeValue.builder().s(newVersion).build()).action(AttributeAction.PUT).build());
+		updatedValues.put("Race", AttributeValueUpdate.builder().value(AttributeValue.builder().s(race).build()).action(AttributeAction.PUT).build());
+		updatedValues.put("Profession", AttributeValueUpdate.builder().value(AttributeValue.builder().s(profession).build()).action(AttributeAction.PUT).build());
+
+        UpdateItemRequest request = UpdateItemRequest.builder()
+                .tableName(tableName)
+                .key(itemKey)
+                //.updateExpression(profession)
+                .attributeUpdates(updatedValues)
+                //.conditionExpression("Version = " + version)
+                .build();
+
+        client.updateItem(request);
+        System.out.println("Done!");
+
+    }
+    
 /*	
 
     
