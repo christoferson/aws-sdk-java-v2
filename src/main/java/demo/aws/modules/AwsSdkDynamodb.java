@@ -171,7 +171,7 @@ public class AwsSdkDynamodb {
 
 	public Map<String, AttributeValue> itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
  
-        HashMap<String,AttributeValue> itemKey = new HashMap<String, AttributeValue>();
+        HashMap<String,AttributeValue> itemKey = new HashMap<>();
         itemKey.put("Region", AttributeValue.builder().s(partitionKey).build());
         itemKey.put("CharacterName", AttributeValue.builder().s(sortKey).build());
 
@@ -199,7 +199,7 @@ public class AwsSdkDynamodb {
 	// ConditionalCheckFailedException - When duplicate
     public void itemRegister(String tableName, String partitionKey, String sortKey, String race, String profession) throws ResourceNotFoundException, DynamoDbException {
 
-		HashMap<String, AttributeValue> itemValues = new HashMap<String, AttributeValue>();
+		HashMap<String, AttributeValue> itemValues = new HashMap<>();
 
 		itemValues.put("Region", AttributeValue.builder().s(partitionKey).build());
 		itemValues.put("CharacterName", AttributeValue.builder().s(sortKey).build());
@@ -218,9 +218,10 @@ public class AwsSdkDynamodb {
 
     }
 
-    public void itemEdit(String tableName, String partitionKey, String sortKey, String race, String profession, String version) throws ResourceNotFoundException, DynamoDbException {
+    public void itemEditV1(String tableName, String partitionKey, String sortKey, String race, String profession, String version) 
+    		throws ResourceNotFoundException, DynamoDbException {
 
-		HashMap<String, AttributeValue> itemKey = new HashMap<String, AttributeValue>();
+		HashMap<String, AttributeValue> itemKey = new HashMap<>();
 		itemKey.put("Region", AttributeValue.builder().s(partitionKey).build());
 		itemKey.put("CharacterName", AttributeValue.builder().s(sortKey).build());
 
@@ -233,15 +234,41 @@ public class AwsSdkDynamodb {
         UpdateItemRequest request = UpdateItemRequest.builder()
                 .tableName(tableName)
                 .key(itemKey)
-                //.updateExpression(profession)
                 .attributeUpdates(updatedValues)
-                //.conditionExpression("Version = " + version)
                 .build();
 
         client.updateItem(request);
         System.out.println("Done!");
 
     }
+    
+    public void itemEdit(String tableName, String partitionKey, String sortKey, String race, String profession, String version) 
+    		throws ResourceNotFoundException, DynamoDbException {
+
+		HashMap<String, AttributeValue> itemKey = new HashMap<>();
+		itemKey.put("Region", AttributeValue.builder().s(partitionKey).build());
+		itemKey.put("CharacterName", AttributeValue.builder().s(sortKey).build());
+
+		String newVersion = String.valueOf(Long.valueOf(version) + 1);
+
+		HashMap<String, AttributeValue> itemValues = new HashMap<String, AttributeValue>();
+		itemValues.put(":v_profession", AttributeValue.builder().s(profession).build());
+		itemValues.put(":v_race", AttributeValue.builder().s(race).build());
+		itemValues.put(":v_version", AttributeValue.builder().s(newVersion).build());
+		itemValues.put(":v_current_version", AttributeValue.builder().s(version).build());
+		
+        UpdateItemRequest request = UpdateItemRequest.builder()
+                .tableName(tableName)
+                .key(itemKey)
+                .updateExpression("SET Version = :v_version, Race = :v_race, Profession = :v_profession")
+                .expressionAttributeValues(itemValues)
+                .conditionExpression("Version = :v_current_version") // Optimistic Locking
+                .build();
+
+        client.updateItem(request);
+        System.out.println("Done!");
+
+    }    
     
 /*	
 
