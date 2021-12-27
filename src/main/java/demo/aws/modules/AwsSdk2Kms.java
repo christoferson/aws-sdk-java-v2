@@ -1,7 +1,5 @@
 package demo.aws.modules;
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -9,6 +7,8 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.AliasListEntry;
+import software.amazon.awssdk.services.kms.model.DecryptRequest;
+import software.amazon.awssdk.services.kms.model.DecryptResponse;
 import software.amazon.awssdk.services.kms.model.EncryptRequest;
 import software.amazon.awssdk.services.kms.model.EncryptResponse;
 import software.amazon.awssdk.services.kms.model.KeyListEntry;
@@ -59,7 +59,7 @@ public class AwsSdk2Kms {
 
     }
     
-    public SdkBytes encryptData(String keyId, String data) throws KmsException {
+    public byte[] encryptData(String keyId, String data) throws KmsException {
 
         SdkBytes myBytes = SdkBytes.fromUtf8String(data);
 
@@ -69,13 +69,29 @@ public class AwsSdk2Kms {
                 .build();
 
         EncryptResponse response = client.encrypt(encryptRequest);
-        String algorithm = response.encryptionAlgorithm().toString();
-        System.out.println("The encryption algorithm is " + algorithm);
+        String algorithm = response.encryptionAlgorithmAsString();
+        System.out.println("Encryption algorithm: " + algorithm);
 
         SdkBytes encryptedData = response.ciphertextBlob();
-        System.out.println(Arrays.toString(encryptedData.asByteArray()));
+        //System.out.println(Arrays.toString(encryptedData.asByteArray()));
 
-        return encryptedData;
+        return encryptedData.asByteArray();
 
     }
+    
+	public String decryptData(String keyId, byte[] encryptedData) throws KmsException {
+		
+		SdkBytes sdkEncryptedData = SdkBytes.fromByteArray(encryptedData);
+
+		DecryptRequest decryptRequest = DecryptRequest.builder()
+				.ciphertextBlob(sdkEncryptedData)
+				.keyId(keyId)
+				.build();
+
+		DecryptResponse decryptResponse = client.decrypt(decryptRequest);
+		SdkBytes decryptedData = decryptResponse.plaintext();
+
+		return decryptedData.asUtf8String();
+
+	}
 }
