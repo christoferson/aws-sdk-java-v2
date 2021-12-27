@@ -28,12 +28,17 @@ import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.TableDescription;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
-
-public class AwsSdkDynamodb {
+//TODO:
+//1 Filter Expression
+//2 Project Expression
+//3 PartiQL
+//4 Auto Scaling
+//5 Paging
+public class AwsSdk2DynamoDb {
 
 	private DynamoDbClient client;
 
-	public AwsSdkDynamodb(AwsCredentialsProvider credentialsProvider, Region region) {
+	public AwsSdk2DynamoDb(AwsCredentialsProvider credentialsProvider, Region region) {
 		
 		this.client = DynamoDbClient.builder()
 				  .credentialsProvider(credentialsProvider)
