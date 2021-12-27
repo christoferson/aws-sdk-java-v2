@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
@@ -182,15 +183,16 @@ public class AwsSdkDynamodb {
 
         Map<String, AttributeValue> item = client.getItem(request).item();
         if (item == null) {
-        	System.out.format("No item found with the key %s!\n", "sss");
+        	System.out.format("No item found with the key %s!\n", itemKey);
         	return null;
         }
 
         Set<String> keys = item.keySet();
-        System.out.print("Amazon DynamoDB table attributes: \n");
+        System.out.println(String.format("Retrieved %s.", itemKey));
         for (String key1 : keys) {
             System.out.format("%s: %s\n", key1, item.get(key1).toString());
         }
+        System.out.println("----------");
 
         return item;
 
@@ -269,6 +271,25 @@ public class AwsSdkDynamodb {
         System.out.println("Done!");
 
     }    
+    
+    public void itemDelete(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
+
+		HashMap<String, AttributeValue> itemKey = new HashMap<>();
+		itemKey.put("Region", AttributeValue.builder().s(partitionKey).build());
+		itemKey.put("CharacterName", AttributeValue.builder().s(sortKey).build());
+
+        DeleteItemRequest deleteReq = DeleteItemRequest.builder()
+                .tableName(tableName)
+                .key(itemKey)
+                .conditionExpression("attribute_exists(CharacterName)")
+                .build();
+
+        client.deleteItem(deleteReq);
+        
+        System.out.println(String.format("Deleted %s", itemKey));
+
+    }
+
     
 /*	
 
