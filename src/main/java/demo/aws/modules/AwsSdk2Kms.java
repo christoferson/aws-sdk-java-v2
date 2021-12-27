@@ -1,11 +1,16 @@
 package demo.aws.modules;
 
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.AliasListEntry;
+import software.amazon.awssdk.services.kms.model.EncryptRequest;
+import software.amazon.awssdk.services.kms.model.EncryptResponse;
 import software.amazon.awssdk.services.kms.model.KeyListEntry;
 import software.amazon.awssdk.services.kms.model.KmsException;
 import software.amazon.awssdk.services.kms.model.ListAliasesRequest;
@@ -51,6 +56,26 @@ public class AwsSdk2Kms {
         for (AliasListEntry alias: aliases) {
             System.out.println(String.format("%s %s", alias.aliasName(), alias.targetKeyId()));
         }
+
+    }
+    
+    public SdkBytes encryptData(String keyId, String data) throws KmsException {
+
+        SdkBytes myBytes = SdkBytes.fromUtf8String(data);
+
+        EncryptRequest encryptRequest = EncryptRequest.builder()
+                .keyId(keyId)
+                .plaintext(myBytes)
+                .build();
+
+        EncryptResponse response = client.encrypt(encryptRequest);
+        String algorithm = response.encryptionAlgorithm().toString();
+        System.out.println("The encryption algorithm is " + algorithm);
+
+        SdkBytes encryptedData = response.ciphertextBlob();
+        System.out.println(Arrays.toString(encryptedData.asByteArray()));
+
+        return encryptedData;
 
     }
 }
