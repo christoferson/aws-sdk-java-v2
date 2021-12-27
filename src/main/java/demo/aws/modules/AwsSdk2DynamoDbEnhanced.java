@@ -6,7 +6,9 @@ import demo.aws.modules.dynamo.GameCharacter;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
@@ -37,6 +39,24 @@ public class AwsSdk2DynamoDbEnhanced {
         	GameCharacter rec = results.next();
             System.out.println(rec);
         }
+
+    }
+    
+	public void itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
+		
+        BeanTableSchema<GameCharacter> schema = TableSchema.fromBean(GameCharacter.class);
+        System.out.println(schema.tableMetadata().primaryPartitionKey());
+        System.out.println(schema.tableMetadata().primarySortKey());
+
+        DynamoDbTable<GameCharacter> mappedTable = client.table(tableName, schema);
+
+        Key key = Key.builder()
+                .partitionValue(partitionKey)
+                .sortValue(sortKey)
+                .build();
+
+        GameCharacter result = mappedTable.getItem(key);
+        System.out.println(result);
 
     }
 	
