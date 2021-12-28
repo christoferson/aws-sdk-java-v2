@@ -1,6 +1,7 @@
 package demo.aws.modules;
 
 import java.util.List;
+import java.util.Objects;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
@@ -34,6 +35,8 @@ public class AwsSdk2Kms {
 	
     public void keyList() throws KmsException {
 
+    	System.out.printf("Listing Keys ... %n");
+    	
         ListKeysRequest listKeysRequest = ListKeysRequest.builder()
                 .limit(15)
                 .build();
@@ -48,6 +51,8 @@ public class AwsSdk2Kms {
 
     public void aliasList() throws KmsException {
 
+    	System.out.printf("Listing Key Aliases ... %n");
+    	
         ListAliasesRequest aliasesRequest = ListAliasesRequest.builder()
             .limit(15)
             .build();
@@ -57,6 +62,26 @@ public class AwsSdk2Kms {
 
         for (AliasListEntry alias: aliases) {
             System.out.println(String.format("%s %s", alias.aliasName(), alias.targetKeyId()));
+        }
+
+    }
+    
+    public void aliasList(String keyId) throws KmsException {
+
+    	Objects.requireNonNull(keyId);
+    	
+    	System.out.printf("Listing Alias for Key = %s ... %n", keyId);
+    	
+        ListAliasesRequest aliasesRequest = ListAliasesRequest.builder()
+            .limit(15)
+            .keyId(keyId)
+            .build();
+
+        ListAliasesResponse aliasesResponse = client.listAliases(aliasesRequest) ;
+        List<AliasListEntry> aliases = aliasesResponse.aliases();
+
+        for (AliasListEntry alias: aliases) {
+            System.out.println(String.format("%s", alias.aliasName()));
         }
 
     }
