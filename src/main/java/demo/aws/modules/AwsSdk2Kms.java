@@ -7,6 +7,8 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.AliasListEntry;
+import software.amazon.awssdk.services.kms.model.CreateAliasRequest;
+import software.amazon.awssdk.services.kms.model.CreateAliasResponse;
 import software.amazon.awssdk.services.kms.model.DecryptRequest;
 import software.amazon.awssdk.services.kms.model.DecryptResponse;
 import software.amazon.awssdk.services.kms.model.EncryptRequest;
@@ -58,6 +60,18 @@ public class AwsSdk2Kms {
         }
 
     }
+    
+	public void aliasCreate(String aliasName, String targetKeyId) throws KmsException {
+
+		CreateAliasRequest aliasRequest = CreateAliasRequest.builder()
+				.aliasName(aliasName)
+				.targetKeyId(targetKeyId)
+				.build();
+
+		CreateAliasResponse response = client.createAlias(aliasRequest);
+		System.out.println(String.format("Created Alias: Alias=%s Key=%s Response=%s", aliasName, targetKeyId, response));
+		
+	}
     
     public byte[] encryptData(String keyId, String data) throws KmsException {
 
