@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import demo.aws.modules.dynamo.DynamoQueryOptions;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -34,6 +35,7 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 //3 PartiQL
 //4 Auto Scaling
 //5 Paging
+//6 Query Index
 public class AwsSdk2DynamoDb {
 
 	private DynamoDbClient client;
@@ -137,6 +139,36 @@ public class AwsSdk2DynamoDb {
                 .keyConditionExpression("#key_region = :v_region")
                 .expressionAttributeNames(attrNames)
                 .expressionAttributeValues(attrValues)
+                .limit(100) 
+                .build();
+
+        QueryResponse response = client.query(queryReq);
+        System.out.println(String.format("Query.Result.Count: %s", response.count()));
+        List<Map<String, AttributeValue>> items = response.items();
+        for (Map<String, AttributeValue> item : items) {
+        	System.out.println(String.format("%s", item));
+        }
+		
+    }
+    
+    public void itemQuery(String tableName, String regionKey, DynamoQueryOptions options) throws DynamoDbException {
+
+        // Set up an alias for the partition key name in case it's a reserved word
+        HashMap<String,String> attrNames = new HashMap<String,String>();
+        attrNames.put("#key_region", "Region");
+
+        // Set up mapping of the partition name with the value
+        HashMap<String, AttributeValue> attrValues = new HashMap<String,AttributeValue>();
+        attrValues.put(":v_region", AttributeValue.builder().s(regionKey).build());
+        attrValues.putAll(options.filterExpressionAttributeValues);
+        
+        QueryRequest queryReq = QueryRequest.builder()
+                .tableName(tableName)
+                .keyConditionExpression("#key_region = :v_region")
+                .expressionAttributeNames(attrNames)
+                .expressionAttributeValues(attrValues)
+                .projectionExpression(options.projection)
+                .filterExpression(options.filter)
                 .build();
 
         QueryResponse response = client.query(queryReq);
@@ -326,35 +358,6 @@ public class AwsSdk2DynamoDb {
         }
 
     }
-    
-    
-    public void itemDelete(String tableName, String keyRegionId, String keyPlayerId) {
-
-        Table table = dynamoDB.getTable(tableName);
-
-        try {
-
-            DeleteItemSpec deleteItemSpec = new DeleteItemSpec()
-            	.withPrimaryKey("Region", keyRegionId, "PlayerID", keyPlayerId)
-                //.withConditionExpression("#ip = :val")
-                //.withNameMap(new NameMap().with("#ip", "InPublication"))
-                //.withValueMap(new ValueMap().withBoolean(":val", false))
-                .withReturnValues(ReturnValue.ALL_OLD);
-
-            DeleteItemOutcome outcome = table.deleteItem(deleteItemSpec);
-
-            // Check the response.
-            System.out.println("Printing item that was deleted...");
-            System.out.println(outcome.getItem().toJSONPretty());
-
-        }
-        catch (Exception e) {
-            System.err.println("Error deleting item in " + tableName);
-            System.err.println(e.getMessage());
-        }
-    }
-    
-
     
     public void executePartiQL(String partiQLString) {
 
