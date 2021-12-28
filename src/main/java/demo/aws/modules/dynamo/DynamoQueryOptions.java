@@ -1,8 +1,13 @@
 package demo.aws.modules.dynamo;
 
+import java.util.HashMap;
+
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+
 public class DynamoQueryOptions {
 	public String projection;
 	public String filter;
+	public HashMap<String, AttributeValue> filterExpressionAttributeValues = new HashMap<>();
 	public static DynamoQueryOptions get() {
 		return new DynamoQueryOptions();
 	}
@@ -10,8 +15,12 @@ public class DynamoQueryOptions {
 		this.projection = projection;
 		return this;
 	}
-	public DynamoQueryOptions withFilter(String filter) {
+	public DynamoQueryOptions withFilter(String filter, DynamoAttribute ... values) {
 		this.filter = filter;
+		for (DynamoAttribute value : values) {
+			this.filterExpressionAttributeValues.put(value.name(), value.value());
+		}
 		return this;
 	}
+	
 }
