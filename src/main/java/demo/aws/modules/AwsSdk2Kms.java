@@ -12,9 +12,12 @@ import software.amazon.awssdk.services.kms.model.CreateAliasRequest;
 import software.amazon.awssdk.services.kms.model.CreateAliasResponse;
 import software.amazon.awssdk.services.kms.model.DecryptRequest;
 import software.amazon.awssdk.services.kms.model.DecryptResponse;
+import software.amazon.awssdk.services.kms.model.DescribeKeyRequest;
+import software.amazon.awssdk.services.kms.model.DescribeKeyResponse;
 import software.amazon.awssdk.services.kms.model.EncryptRequest;
 import software.amazon.awssdk.services.kms.model.EncryptResponse;
 import software.amazon.awssdk.services.kms.model.KeyListEntry;
+import software.amazon.awssdk.services.kms.model.KeyMetadata;
 import software.amazon.awssdk.services.kms.model.KmsException;
 import software.amazon.awssdk.services.kms.model.ListAliasesRequest;
 import software.amazon.awssdk.services.kms.model.ListAliasesResponse;
@@ -98,6 +101,21 @@ public class AwsSdk2Kms {
 		
 	}
     
+	public void keyDescribe(String keyId) throws KmsException {
+
+		Objects.requireNonNull(keyId);
+		
+		DescribeKeyRequest keyRequest = DescribeKeyRequest.builder().keyId(keyId).build();
+
+		DescribeKeyResponse response = client.describeKey(keyRequest);
+		KeyMetadata metadata = response.keyMetadata();
+		System.out.println("Description: " + metadata.description());
+		System.out.println("Key Arn: " + metadata.arn());
+		System.out.printf("Key Spec: %s %n", metadata.keySpecAsString());
+		System.out.printf("Key State: %s %n", metadata.keyStateAsString());
+
+	}
+	
     public byte[] encryptData(String keyId, String data) throws KmsException {
 
         SdkBytes myBytes = SdkBytes.fromUtf8String(data);
