@@ -49,34 +49,28 @@ public class AwsSdk2DynamoDb {
 
 	}
 	
-	public void tableList() {
+	public void tableList() throws DynamoDbException {
 
         String lastName = null;
 
-        try {
+		do {
 
-			do {
+			ListTablesRequest request = ListTablesRequest.builder()
+					.exclusiveStartTableName(lastName)
+					.limit(10)
+					.build();
+			ListTablesResponse response = client.listTables(request);
 
-				ListTablesRequest request = ListTablesRequest.builder()
-						.exclusiveStartTableName(lastName)
-						.limit(10)
-						.build();
-				ListTablesResponse response = client.listTables(request);
+			List<String> tableNames = response.tableNames();
 
-				List<String> tableNames = response.tableNames();
+			for (String curName : tableNames) {
+				System.out.format("* %s\n", curName);
+			}
 
-				for (String curName : tableNames) {
-					System.out.format("* %s\n", curName);
-				}
+			lastName = response.lastEvaluatedTableName();
 
-				lastName = response.lastEvaluatedTableName();
-
-			} while (lastName != null);
+		} while (lastName != null);
 			
-		} catch (DynamoDbException e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
-		}
         System.out.println("\nDone!");
     }
  
@@ -204,7 +198,7 @@ public class AwsSdk2DynamoDb {
         for (Map<String, AttributeValue> item : items) {
         	System.out.println(String.format("%s", item));
         }
-		
+
     }    
 
 	public Map<String, AttributeValue> itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
