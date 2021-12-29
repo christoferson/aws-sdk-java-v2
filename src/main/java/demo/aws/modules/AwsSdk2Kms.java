@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.kms.model.DescribeKeyRequest;
 import software.amazon.awssdk.services.kms.model.DescribeKeyResponse;
 import software.amazon.awssdk.services.kms.model.EncryptRequest;
 import software.amazon.awssdk.services.kms.model.EncryptResponse;
+import software.amazon.awssdk.services.kms.model.GetKeyPolicyRequest;
+import software.amazon.awssdk.services.kms.model.GetKeyPolicyResponse;
 import software.amazon.awssdk.services.kms.model.KeyListEntry;
 import software.amazon.awssdk.services.kms.model.KeyMetadata;
 import software.amazon.awssdk.services.kms.model.KmsException;
@@ -127,6 +129,16 @@ public class AwsSdk2Kms {
 		for (String policyName : result.policyNames()) {
 			System.out.printf("%s %n", policyName);
 		}
+
+	}
+
+	public void keyGetPolicy(String keyId, String policyName) throws KmsException {
+
+		Objects.requireNonNull(keyId);
+
+		GetKeyPolicyRequest req = GetKeyPolicyRequest.builder().keyId(keyId).policyName(policyName).build();
+		GetKeyPolicyResponse result = client.getKeyPolicy(req);
+		System.out.printf("%s %n", result.policy());
 
 	}
 	
