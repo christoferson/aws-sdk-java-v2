@@ -21,6 +21,8 @@ import software.amazon.awssdk.services.kms.model.KeyMetadata;
 import software.amazon.awssdk.services.kms.model.KmsException;
 import software.amazon.awssdk.services.kms.model.ListAliasesRequest;
 import software.amazon.awssdk.services.kms.model.ListAliasesResponse;
+import software.amazon.awssdk.services.kms.model.ListKeyPoliciesRequest;
+import software.amazon.awssdk.services.kms.model.ListKeyPoliciesResponse;
 import software.amazon.awssdk.services.kms.model.ListKeysRequest;
 import software.amazon.awssdk.services.kms.model.ListKeysResponse;
 
@@ -113,6 +115,18 @@ public class AwsSdk2Kms {
 		System.out.println("Key Arn: " + metadata.arn());
 		System.out.printf("Key Spec: %s %n", metadata.keySpecAsString());
 		System.out.printf("Key State: %s %n", metadata.keyStateAsString());
+
+	}
+	
+	public void keyListPolicy(String keyId) throws KmsException {
+
+		Objects.requireNonNull(keyId);
+
+		ListKeyPoliciesRequest req = ListKeyPoliciesRequest.builder().keyId(keyId).build();
+		ListKeyPoliciesResponse result = client.listKeyPolicies(req);
+		for (String policyName : result.policyNames()) {
+			System.out.printf("%s %n", policyName);
+		}
 
 	}
 	
