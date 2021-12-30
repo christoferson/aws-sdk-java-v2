@@ -27,6 +27,8 @@ import software.amazon.awssdk.services.kms.model.ListKeyPoliciesRequest;
 import software.amazon.awssdk.services.kms.model.ListKeyPoliciesResponse;
 import software.amazon.awssdk.services.kms.model.ListKeysRequest;
 import software.amazon.awssdk.services.kms.model.ListKeysResponse;
+import software.amazon.awssdk.services.kms.model.PutKeyPolicyRequest;
+import software.amazon.awssdk.services.kms.model.PutKeyPolicyResponse;
 
 public class AwsSdk2Kms {
 
@@ -139,6 +141,16 @@ public class AwsSdk2Kms {
 		GetKeyPolicyRequest req = GetKeyPolicyRequest.builder().keyId(keyId).policyName(policyName).build();
 		GetKeyPolicyResponse result = client.getKeyPolicy(req);
 		System.out.printf("%s %n", result.policy());
+
+	}
+	
+	public void keyPutPolicy(String keyId, String policyName, String policy) throws KmsException {
+
+		Objects.requireNonNull(keyId);
+
+		PutKeyPolicyRequest req = PutKeyPolicyRequest.builder().keyId(keyId).policyName(policyName).policy(policy).build();
+		PutKeyPolicyResponse result = client.putKeyPolicy(req);
+		System.out.printf("%s %n", result);
 
 	}
 	
