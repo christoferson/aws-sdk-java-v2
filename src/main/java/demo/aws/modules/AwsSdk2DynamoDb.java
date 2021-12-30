@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
+import software.amazon.awssdk.services.dynamodb.model.ExecuteStatementRequest;
+import software.amazon.awssdk.services.dynamodb.model.ExecuteStatementResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
@@ -118,6 +120,22 @@ public class AwsSdk2DynamoDb {
 
     }
     
+    public void dynamoExecuteStatement(String statement) throws DynamoDbException {
+    	
+    	System.out.printf("Executing %s... %n", statement);
+    	 
+    	ExecuteStatementRequest scanRequest = ExecuteStatementRequest.builder()
+                    .statement(statement)
+                    .build();
+
+    	ExecuteStatementResponse response = client.executeStatement(scanRequest);
+        for (Map<String, AttributeValue> item : response.items()) {
+            System.out.println(item);
+        }
+
+        System.out.println("");
+    }    
+    
     public void itemQuery(String tableName, String regionKey) throws DynamoDbException {
 
         // Set up an alias for the partition key name in case it's a reserved word
@@ -199,7 +217,7 @@ public class AwsSdk2DynamoDb {
         	System.out.println(String.format("%s", item));
         }
 
-    }    
+    }
 
 	public Map<String, AttributeValue> itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
  
