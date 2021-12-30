@@ -3,6 +3,7 @@ package demo.aws.modules;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import demo.aws.modules.dynamo.DynamoQueryOptions;
@@ -32,9 +33,9 @@ import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.TableDescription;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 //TODO:
-//1 Filter Expression
-//2 Project Expression
-//3 PartiQL
+//1 Filter Expression OK
+//2 Project Expression OK
+//3 PartiQL OK
 //4 Auto Scaling
 //5 Paging
 //6 Query Index
@@ -86,7 +87,7 @@ public class AwsSdk2DynamoDb {
 		if (tableInfo == null) {
 			return;
 		}
-		
+
 		System.out.format("Table Name  : %s\n", tableInfo.tableName());
 		System.out.format("Table ARN   : %s\n", tableInfo.tableArn());
 		System.out.format("Status      : %s\n", tableInfo.tableStatus());
@@ -104,19 +105,24 @@ public class AwsSdk2DynamoDb {
 		for (AttributeDefinition a : attributes) {
 			System.out.format("  %s (%s)\n", a.attributeName(), a.attributeType());
 		}
-	
+
 	}
 	
-    public void tableScan(String tableName) throws DynamoDbException {
+    public void tableScan(String tableName, DynamoQueryOptions options) throws DynamoDbException {
+    	
+    	Objects.requireNonNull(tableName);
  
     	ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(tableName)
+                    .limit(options.limit)
                     .build();
 
         ScanResponse response = client.scan(scanRequest);
         for (Map<String, AttributeValue> item : response.items()) {
             System.out.println(item);
         }
+        
+        System.out.println("");
 
     }
     
