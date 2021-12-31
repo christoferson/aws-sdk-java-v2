@@ -115,6 +115,8 @@ public class AwsSdk2DynamoDb {
     	ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(tableName)
                     .limit(options.limit)
+                    //project
+                    //filter
                     .build();
 
         ScanResponse response = client.scan(scanRequest);
