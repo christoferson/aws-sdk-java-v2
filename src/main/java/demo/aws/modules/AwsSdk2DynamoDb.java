@@ -115,6 +115,7 @@ public class AwsSdk2DynamoDb {
     	ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(tableName)
                     .limit(options.limit)
+                    .projectionExpression(options.projection)
                     //project
                     //filter
                     .build();
