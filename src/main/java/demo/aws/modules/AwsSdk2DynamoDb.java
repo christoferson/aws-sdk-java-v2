@@ -141,6 +141,8 @@ public class AwsSdk2DynamoDb {
         for (Map<String, AttributeValue> item : response.items()) {
             System.out.println(item);
         }
+        
+        System.out.println(response.nextToken());
 
         System.out.println("");
     }    
