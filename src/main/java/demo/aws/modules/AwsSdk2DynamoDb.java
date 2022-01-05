@@ -118,6 +118,7 @@ public class AwsSdk2DynamoDb {
                     .projectionExpression(options.projection)
                     .filterExpression(options.filter)
                     .expressionAttributeValues(options.filterExpressionAttributeValues)
+                    .consistentRead(options.consistentRead)
                     .build();
 
         ScanResponse response = client.scan(scanRequest);
