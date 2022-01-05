@@ -12,6 +12,13 @@ public class DynamoAttribute {
 		attribute.name = name;
 		return attribute;
 	}
+
+	public static DynamoAttribute builder(String name, String value) {
+		DynamoAttribute attribute = new DynamoAttribute();
+		attribute.name = name;
+		attribute.value = AttributeValue.builder().s(value).build();
+		return attribute;
+	}
 	
 	public String name() {
 		return this.name;

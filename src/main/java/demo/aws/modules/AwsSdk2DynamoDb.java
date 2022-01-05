@@ -111,17 +111,18 @@ public class AwsSdk2DynamoDb {
     public void tableScan(String tableName, DynamoQueryOptions options) throws DynamoDbException {
     	
     	Objects.requireNonNull(tableName);
- 
+    	
     	ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(tableName)
-                    .limit(options.limit)
-                    .projectionExpression(options.projection)
-                    .filterExpression(options.filter)
-                    .expressionAttributeValues(options.filterExpressionAttributeValues)
-                    .consistentRead(options.consistentRead)
+                    .limit(options.getLimit())
+                    .projectionExpression(options.getProjection())
+                    .filterExpression(options.getFilter())
+                    .expressionAttributeValues(options.getFilterExpressionAttributeValues())
+                    .consistentRead(options.getConsistentRead())
                     .build();
 
         ScanResponse response = client.scan(scanRequest);
+        System.out.printf("Scan.Result.Count: %s %n", response.count());
         for (Map<String, AttributeValue> item : response.items()) {
             System.out.println(item);
         }
@@ -139,11 +140,12 @@ public class AwsSdk2DynamoDb {
                     .build();
 
     	ExecuteStatementResponse response = client.executeStatement(scanRequest);
+    	System.out.printf("PartiQL.Result.Count: %s %n", response.items().size());
         for (Map<String, AttributeValue> item : response.items()) {
             System.out.println(item);
         }
         
-        System.out.println(response.nextToken());
+        System.out.printf("Next Token: %s %n", response.nextToken());
 
         System.out.println("");
     }    
