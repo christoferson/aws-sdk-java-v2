@@ -28,6 +28,7 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.dynamodb.model.ReturnConsumedCapacity;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.TableDescription;
@@ -119,6 +120,7 @@ public class AwsSdk2DynamoDb {
                     .filterExpression(options.getFilter())
                     .expressionAttributeValues(options.getFilterExpressionAttributeValues())
                     .consistentRead(options.getConsistentRead())
+                    .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
                     .build();
 
         ScanResponse response = client.scan(scanRequest);
@@ -197,6 +199,7 @@ public class AwsSdk2DynamoDb {
                 .expressionAttributeValues(attrValues)
                 .projectionExpression(options.projection)
                 .filterExpression(options.filter)
+                .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
                 .build();
 
         QueryResponse response = client.query(queryReq);
