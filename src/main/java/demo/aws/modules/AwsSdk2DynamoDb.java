@@ -123,6 +123,8 @@ public class AwsSdk2DynamoDb {
 
         ScanResponse response = client.scan(scanRequest);
         System.out.printf("Scan.Result.Count: %s %n", response.count());
+        
+        System.out.printf("Scan.Result.consumedCapacity.capacityUnits: %s %n", response.consumedCapacity().capacityUnits());
         for (Map<String, AttributeValue> item : response.items()) {
             System.out.println(item);
         }
@@ -199,6 +201,7 @@ public class AwsSdk2DynamoDb {
 
         QueryResponse response = client.query(queryReq);
         System.out.println(String.format("Query.Result.Count: %s", response.count()));
+        System.out.printf("Query.Result.consumedCapacity.capacityUnits: %s %n", response.consumedCapacity().capacityUnits());
         List<Map<String, AttributeValue>> items = response.items();
         for (Map<String, AttributeValue> item : items) {
         	System.out.println(String.format("%s", item));
