@@ -2,6 +2,7 @@ package demo.aws.modules;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.Random;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -24,8 +25,24 @@ public class AwsSdk2S3 {
 		this.client = S3Client.builder()
 				  .credentialsProvider(credentialsProvider)
 				  .region(region)
+				  .overrideConfiguration(builder -> builder
+					.apiCallTimeout(Duration.ofMinutes(2))
+					//.apiCallAttemptTimeout(/* 15 min */)
+					//.retryPolicy(RetryMode.STANDARD)
+					.build())
 				  .build();
 	}
+	
+//	@Provides @Singleton
+//	S3AsyncClient providesS3AsyncClient(AwsCredentialsProvider credentials) {
+//	  return S3AsyncClient.builder()
+//	      .region(Region.of(config.getString("region")))
+//	      .credentialsProvider(credentials)
+//	      .overrideConfiguration(builder -> builder
+//	        .apiCallTimeout(/* 45 min */)
+//	        .apiCallAttemptTimeout(/* 15 min */)
+//	      ).build();
+//	}
 	
     public void multipartUpload(String bucketName, String key) throws IOException {
 
