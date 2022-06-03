@@ -44,9 +44,9 @@ public class AwsSdk2S3 {
 //	      ).build();
 //	}
 	
-    public void multipartUpload(String bucketName, String key) throws IOException {
+	private static final int MEGA_BYTES = 1024 * 1024;
 
-        int mB = 1024 * 1024;
+    public void multipartUpload(String bucketName, String key) throws IOException {
 
         // First create a multipart upload and get the upload id
         CreateMultipartUploadRequest createMultipartUploadRequest = CreateMultipartUploadRequest.builder()
@@ -59,22 +59,22 @@ public class AwsSdk2S3 {
         System.out.println(uploadId);
 
         // Upload all the different parts of the object
-        UploadPartRequest uploadPartRequest1 = UploadPartRequest.builder()
-                .bucket(bucketName)
-                 .key(key)
-                .uploadId(uploadId)
-                .partNumber(1).build();
+		UploadPartRequest uploadPartRequest1 = UploadPartRequest.builder()
+				.bucket(bucketName)
+				.key(key)
+				.uploadId(uploadId)
+				.partNumber(1)
+				.build();
 
-        String etag1 = client.uploadPart(uploadPartRequest1, RequestBody.fromByteBuffer(getRandomByteBuffer(5 * mB))).eTag();
+        String etag1 = client.uploadPart(uploadPartRequest1, RequestBody.fromByteBuffer(getRandomByteBuffer(5 * MEGA_BYTES))).eTag();
 
         CompletedPart part1 = CompletedPart.builder().partNumber(1).eTag(etag1).build();
 
         UploadPartRequest uploadPartRequest2 = UploadPartRequest.builder().bucket(bucketName).key(key)
                 .uploadId(uploadId)
                 .partNumber(2).build();
-        String etag2 = client.uploadPart(uploadPartRequest2, RequestBody.fromByteBuffer(getRandomByteBuffer(3 * mB))).eTag();
+        String etag2 = client.uploadPart(uploadPartRequest2, RequestBody.fromByteBuffer(getRandomByteBuffer(3 * MEGA_BYTES))).eTag();
         CompletedPart part2 = CompletedPart.builder().partNumber(2).eTag(etag2).build();
-
 
         // Finally call completeMultipartUpload operation to tell S3 to merge all uploaded
         // parts and finish the multipart operation.
@@ -82,8 +82,7 @@ public class AwsSdk2S3 {
                 .parts(part1, part2)
                 .build();
 
-        CompleteMultipartUploadRequest completeMultipartUploadRequest =
-                CompleteMultipartUploadRequest.builder()
+        CompleteMultipartUploadRequest completeMultipartUploadRequest = CompleteMultipartUploadRequest.builder()
                         .bucket(bucketName)
                         .key(key)
                         .uploadId(uploadId)
