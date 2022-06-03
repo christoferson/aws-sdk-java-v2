@@ -1,5 +1,7 @@
 package demo.aws.modules;
 
+import java.nio.ByteBuffer;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,12 +12,15 @@ import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.AliasListEntry;
 import software.amazon.awssdk.services.kms.model.CreateAliasRequest;
 import software.amazon.awssdk.services.kms.model.CreateAliasResponse;
+import software.amazon.awssdk.services.kms.model.DataKeySpec;
 import software.amazon.awssdk.services.kms.model.DecryptRequest;
 import software.amazon.awssdk.services.kms.model.DecryptResponse;
 import software.amazon.awssdk.services.kms.model.DescribeKeyRequest;
 import software.amazon.awssdk.services.kms.model.DescribeKeyResponse;
 import software.amazon.awssdk.services.kms.model.EncryptRequest;
 import software.amazon.awssdk.services.kms.model.EncryptResponse;
+import software.amazon.awssdk.services.kms.model.GenerateDataKeyRequest;
+import software.amazon.awssdk.services.kms.model.GenerateDataKeyResponse;
 import software.amazon.awssdk.services.kms.model.GetKeyPolicyRequest;
 import software.amazon.awssdk.services.kms.model.GetKeyPolicyResponse;
 import software.amazon.awssdk.services.kms.model.KeyListEntry;
@@ -63,7 +68,7 @@ public class AwsSdk2Kms {
     	System.out.printf("Listing Key Aliases ... %n");
     	
         ListAliasesRequest aliasesRequest = ListAliasesRequest.builder()
-            .limit(15)
+            .limit(50)
             .build();
 
         ListAliasesResponse aliasesResponse = client.listAliases(aliasesRequest) ;
@@ -82,7 +87,7 @@ public class AwsSdk2Kms {
     	System.out.printf("Listing Alias for Key = %s ... %n", keyId);
     	
         ListAliasesRequest aliasesRequest = ListAliasesRequest.builder()
-            .limit(15)
+            .limit(2)
             .keyId(keyId)
             .build();
 
@@ -189,4 +194,29 @@ public class AwsSdk2Kms {
 		return decryptedData.asUtf8String();
 
 	}
+	
+	public byte[] generateDataKey(String keyId) throws KmsException {
+		
+        GenerateDataKeyRequest dataKeyRequest = GenerateDataKeyRequest.builder()
+        		.keyId(keyId)
+        		.keySpec(DataKeySpec.AES_256)
+        		.build();
+
+        GenerateDataKeyResponse dataKeyResult = client.generateDataKey(dataKeyRequest);
+
+        SdkBytes plaintextKey = dataKeyResult.plaintext();
+
+        SdkBytes encryptedKey = dataKeyResult.ciphertextBlob();
+
+        System.out.printf(
+            "Key(Encrypted): %s%n Key(Plain): %s%n",
+            encryptedKey,
+            plaintextKey
+        );
+        
+
+		return encryptedKey.asByteArray();
+
+	}
+	
 }
