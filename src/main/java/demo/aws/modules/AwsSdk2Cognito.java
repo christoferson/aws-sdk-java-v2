@@ -56,7 +56,7 @@ public class AwsSdk2Cognito {
         
 	}
 
-	public Map<String, String> userPoolListUsers(String poolId) {
+	public Map<String, String> userPoolListUsers(String poolId, Integer limit) {
 
 		Map<String, String> users = new TreeMap<>();
 		
@@ -64,7 +64,7 @@ public class AwsSdk2Cognito {
         	
         	ListUsersRequest request = ListUsersRequest.builder()
         			.userPoolId(poolId)
-        			.limit(60)
+        			.limit(limit)
         			.build();
         	ListUsersResponse result = client.listUsers(request);
             List<UserType> list = result.users();
@@ -166,7 +166,7 @@ public class AwsSdk2Cognito {
 			AttributeType userAttrs2 = AttributeType.builder().name("email_verified").value("true").build();
 
 			AdminCreateUserRequest userRequest = AdminCreateUserRequest.builder().userPoolId(userPoolId).username(name)
-					//.temporaryPassword(password)
+					.temporaryPassword(password)
 					.userAttributes(userAttrs, userAttrs2)
 					//.messageAction(MessageActionType.SUPPRESS)
 					.build();
