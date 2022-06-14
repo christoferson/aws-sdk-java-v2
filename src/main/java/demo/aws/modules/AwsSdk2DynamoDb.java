@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.ExecuteStatementRequest;
 import software.amazon.awssdk.services.dynamodb.model.ExecuteStatementResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputDescription;
@@ -52,6 +53,7 @@ public class AwsSdk2DynamoDb {
 				  .build();
 
 	}
+
 	
 	public void tableList() throws DynamoDbException {
 
@@ -238,6 +240,26 @@ public class AwsSdk2DynamoDb {
         }
 
     }
+    
+    public void itemGet(String tableName, String regionKey, String sortKey) throws DynamoDbException {
+
+    	Map<String, AttributeValue> keyMap = new HashMap<>();
+        keyMap.put("Region", AttributeValue.builder().s(regionKey).build());
+        keyMap.put("CharacterName", AttributeValue.builder().s(sortKey).build());
+        
+        GetItemRequest queryReq = GetItemRequest.builder()
+                .tableName(tableName)
+                .key(keyMap)
+                .build();
+
+        GetItemResponse response = client.getItem(queryReq);
+        System.out.println(String.format("Query.Result: %s", response));
+        Map<String, AttributeValue> item = response.item();
+        System.out.println(String.format("%s", item));
+
+    }
+    
+    // TODO: Batch Item Get
 
 	public Map<String, AttributeValue> itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
  
