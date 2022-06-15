@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import demo.aws.modules.dynamo.DynamoQueryOptions;
+import demo.aws.modules.dynamo.DynamoTableKey;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -14,6 +15,8 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
@@ -21,6 +24,7 @@ import software.amazon.awssdk.services.dynamodb.model.ExecuteStatementRequest;
 import software.amazon.awssdk.services.dynamodb.model.ExecuteStatementResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.KeysAndAttributes;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
 import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputDescription;
@@ -259,7 +263,35 @@ public class AwsSdk2DynamoDb {
 
     }
     
-    // TODO: Batch Item Get
+    public void itemBatchGet(List<DynamoTableKey> tableKeyList) throws DynamoDbException {
+
+    	Map<String, KeysAndAttributes> batchKeyMap = new HashMap<>();
+    	
+    	for (DynamoTableKey tableKey : tableKeyList) {
+	    	Map<String, AttributeValue> keyMap = new HashMap<>();
+	        keyMap.put(tableKey.getHashKeyName(), AttributeValue.builder().s(tableKey.getHashKey()).build());
+	        keyMap.put(tableKey.getSortKeyName(), AttributeValue.builder().s(tableKey.getSortKey()).build());	        
+	        batchKeyMap.put(tableKey.getTableName(), KeysAndAttributes.builder().keys(keyMap).build());
+    	}
+    	
+        BatchGetItemRequest request = BatchGetItemRequest.builder()
+                .requestItems(batchKeyMap)
+                .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+                .build();
+
+        BatchGetItemResponse response = client.batchGetItem(request);
+        
+        Map<String, List<Map<String, AttributeValue>>> responseMap = response.responses();
+        System.out.println(String.format("Query.ConsumedCapacity: %s", response.consumedCapacity()));
+        System.out.println(String.format("Query.Result.Count: %s", responseMap.size()));
+        
+        for (List<Map<String, AttributeValue>> batchGetResponse : responseMap.values()) {
+        	for (Map<String, AttributeValue> getResponse : batchGetResponse) {
+        		System.out.println(String.format("%s", getResponse));
+        	}
+        }
+
+    }
 
 	public Map<String, AttributeValue> itemRetrieve(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
  
