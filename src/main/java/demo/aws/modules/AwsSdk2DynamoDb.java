@@ -245,18 +245,21 @@ public class AwsSdk2DynamoDb {
 
     }
     
-    public void itemGet(String tableName, String regionKey, String sortKey) throws DynamoDbException {
+    public void itemGet(DynamoTableKey tableKey) throws DynamoDbException {
 
     	Map<String, AttributeValue> keyMap = new HashMap<>();
-        keyMap.put("Region", AttributeValue.builder().s(regionKey).build());
-        keyMap.put("CharacterName", AttributeValue.builder().s(sortKey).build());
+        keyMap.put(tableKey.getHashKeyName(), AttributeValue.builder().s(tableKey.getHashKey()).build());
+        keyMap.put(tableKey.getSortKeyName(), AttributeValue.builder().s(tableKey.getSortKey()).build());
         
         GetItemRequest queryReq = GetItemRequest.builder()
-                .tableName(tableName)
+                .tableName(tableKey.getTableName())
                 .key(keyMap)
+                .consistentRead(false)
+                .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
                 .build();
 
         GetItemResponse response = client.getItem(queryReq);
+        System.out.println(String.format("Query.ConsumedCapacity: %s", response.consumedCapacity()));
         System.out.println(String.format("Query.Result: %s", response));
         Map<String, AttributeValue> item = response.item();
         System.out.println(String.format("%s", item));
