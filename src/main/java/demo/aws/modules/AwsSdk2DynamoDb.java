@@ -18,6 +18,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.ExecuteStatementRequest;
@@ -45,6 +46,7 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 //4 Auto Scaling
 //5 Paging
 //6 Query Index
+//Delete Table
 public class AwsSdk2DynamoDb {
 
 	private DynamoDbClient client;
@@ -437,7 +439,25 @@ public class AwsSdk2DynamoDb {
         System.out.println(String.format("Deleted %s", itemKey));
 
     }
+    
+    public void itemDelete(DynamoTableKey tableKey) throws DynamoDbException {
 
+		HashMap<String, AttributeValue> itemKey = new HashMap<>();
+		itemKey.put(tableKey.getHashKeyName(), AttributeValue.builder().s(tableKey.getHashKey()).build());
+		itemKey.put(tableKey.getSortKeyName(), AttributeValue.builder().s(tableKey.getSortKey()).build());
+
+        DeleteItemRequest deleteReq = DeleteItemRequest.builder()
+                .tableName(tableKey.getTableName())
+                .key(itemKey)
+                .conditionExpression(String.format("attribute_exists(%s)", tableKey.getSortKeyName()))
+                .build();
+
+        DeleteItemResponse response = client.deleteItem(deleteReq);
+        
+        System.out.println(String.format("Deleted %s. Response~%s", itemKey, response));
+
+    }
+    
     
 /*	
 
