@@ -345,7 +345,29 @@ public class AwsSdk2DynamoDb {
 		System.out.println("" + response);
 
     }
+    
 
+    public void itemRegister(DynamoTableKey tableKey, String race, String profession) throws ResourceNotFoundException, DynamoDbException {
+
+		HashMap<String, AttributeValue> itemValues = new HashMap<>();
+
+		itemValues.put(tableKey.getHashKeyName(), AttributeValue.builder().s(tableKey.getHashKey()).build());
+		itemValues.put(tableKey.getSortKeyName(), AttributeValue.builder().s(tableKey.getSortKey()).build());
+		itemValues.put("Profession", AttributeValue.builder().s(profession).build());
+		itemValues.put("Race", AttributeValue.builder().s(race).build());
+		itemValues.put("Version", AttributeValue.builder().s("1").build());
+
+		PutItemRequest request = PutItemRequest.builder()
+				.tableName(tableKey.getTableName())
+				.item(itemValues)
+				.conditionExpression(String.format("attribute_not_exists(%s)", tableKey.getSortKey()))
+				.build();
+
+		PutItemResponse response = client.putItem(request);
+		System.out.println("" + response);
+
+    }
+    
     public void itemEditV1(String tableName, String partitionKey, String sortKey, String race, String profession, String version) 
     		throws ResourceNotFoundException, DynamoDbException {
 
