@@ -1,10 +1,16 @@
 package demo.aws.modules;
 
+import java.util.List;
+
+
+
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
+import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 public class AwsSdk2Sqs {
 
@@ -19,6 +25,8 @@ public class AwsSdk2Sqs {
 	}
 	
     public void queueList() {
+
+    	System.out.println(String.format("Listing Queues..."));
     	
     	ListQueuesRequest request = ListQueuesRequest.builder()
                 .build();
@@ -28,5 +36,32 @@ public class AwsSdk2Sqs {
             System.out.println(String.format("%s", url));
         }
 
-    }	
+    }
+
+    public void messageReceiveLongPolling(String queueUrl) {
+		
+		System.out.println(String.format("Queue:%s Receiving Message (Long)...", queueUrl));
+		
+		ReceiveMessageRequest request = ReceiveMessageRequest.builder()
+				.queueUrl(queueUrl)
+				.maxNumberOfMessages(10)
+				//When the wait time for the ReceiveMessage API action is greater than 0, long polling is in effect. 
+				//The maximum long polling wait time is 20 seconds.
+				.waitTimeSeconds(20)
+				.build();
+		
+		List<Message> messages = client.receiveMessage(request).messages();
+		
+		for (Message m : messages) {
+			System.out.println(String.format("Queue:%s Received Message: %s", queueUrl, m));
+			System.out.println("   " + m.body());
+			System.out.println("   " + m.attributesAsStrings());
+		}
+		// Delete Messages after Receipt
+		//for (Message m : messages) {
+		//	client.deleteMessage(queueUrl, m.getReceiptHandle());
+		//}
+		
+	}
+
 }
