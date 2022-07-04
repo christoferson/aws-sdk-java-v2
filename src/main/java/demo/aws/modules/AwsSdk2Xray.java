@@ -1,12 +1,22 @@
 package demo.aws.modules;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.xray.XRayClient;
 import software.amazon.awssdk.services.xray.model.GetGroupsResponse;
+import software.amazon.awssdk.services.xray.model.GetServiceGraphRequest;
+import software.amazon.awssdk.services.xray.model.GetServiceGraphResponse;
+import software.amazon.awssdk.services.xray.model.GetTraceSummariesRequest;
+import software.amazon.awssdk.services.xray.model.GetTraceSummariesResponse;
 import software.amazon.awssdk.services.xray.model.GroupSummary;
+import software.amazon.awssdk.services.xray.model.ResourceARNDetail;
+import software.amazon.awssdk.services.xray.model.Service;
+import software.amazon.awssdk.services.xray.model.TraceSummary;
 
 public class AwsSdk2Xray {
 
@@ -22,10 +32,6 @@ public class AwsSdk2Xray {
 	
 	public void groupList() {
 
-        	
-	//	ListUserPoolsRequest request = ListUserPoolsRequest.builder()
-	//			.maxResults(3)
-	//			.build();
 		GetGroupsResponse result = client.getGroups();
 	    List<GroupSummary> list = result.groups();
 	
@@ -35,6 +41,23 @@ public class AwsSdk2Xray {
         
 	}
 
+	public void serviceGraphGet() {
+		
+		System.out.println(String.format("Get ServiceGraph"));
+		
+		GetServiceGraphRequest request = GetServiceGraphRequest.builder()
+				.startTime(Instant.now().minus(3, ChronoUnit.HOURS))
+				.endTime(Instant.now())
+				.build();
+
+		GetServiceGraphResponse result = client.getServiceGraph(request);
+	    List<Service> list = result.services();
+	
+	    for (Service element : list) {
+	        System.out.println(String.format("%s %s %s", element.name(), element.startTime(), element.endTime()));
+	    }
+        
+	}
 	
 	
 }
