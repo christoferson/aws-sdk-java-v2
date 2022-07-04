@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import demo.aws.modules.dynamo.DynamoAttribute;
+import demo.aws.modules.dynamo.DynamoAttributeList;
 import demo.aws.modules.dynamo.DynamoQueryOptions;
 import demo.aws.modules.dynamo.DynamoTableKey;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -46,7 +48,16 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 //4 Auto Scaling
 //5 Paging
 //6 Query Index
-//Delete Table
+//7 Delete Table
+//8 Register - Conditional
+//9 Create Table
+//BatchWriteItem
+//BatchGetItem
+//TTL
+//Data Types
+//TransacGetItems
+//TransacWriteItems
+//ItemUpdate
 public class AwsSdk2DynamoDb {
 
 	private DynamoDbClient client;
@@ -260,6 +271,7 @@ public class AwsSdk2DynamoDb {
                 .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
                 .build();
 
+        System.out.println(String.format("Query.Key: %s", tableKey));
         GetItemResponse response = client.getItem(queryReq);
         System.out.println(String.format("Query.ConsumedCapacity: %s", response.consumedCapacity()));
         System.out.println(String.format("Query.Result: %s", response));
@@ -349,15 +361,18 @@ public class AwsSdk2DynamoDb {
     }
     
 
-    public void itemRegister(DynamoTableKey tableKey, String race, String profession) throws ResourceNotFoundException, DynamoDbException {
+    public void itemRegister(DynamoTableKey tableKey, DynamoAttributeList attributeList) throws ResourceNotFoundException, DynamoDbException {
 
 		HashMap<String, AttributeValue> itemValues = new HashMap<>();
 
 		itemValues.put(tableKey.getHashKeyName(), AttributeValue.builder().s(tableKey.getHashKey()).build());
 		itemValues.put(tableKey.getSortKeyName(), AttributeValue.builder().s(tableKey.getSortKey()).build());
-		itemValues.put("Profession", AttributeValue.builder().s(profession).build());
-		itemValues.put("Race", AttributeValue.builder().s(race).build());
+		//itemValues.put("Profession", AttributeValue.builder().s(profession).build());
+		//itemValues.put("Race", AttributeValue.builder().s(race).build());
 		itemValues.put("Version", AttributeValue.builder().s("1").build());
+		for (DynamoAttribute attribute : attributeList.items()) {
+			itemValues.put(attribute.name(), attribute.value());
+		}
 
 		PutItemRequest request = PutItemRequest.builder()
 				.tableName(tableKey.getTableName())
