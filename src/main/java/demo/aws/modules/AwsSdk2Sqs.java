@@ -1,11 +1,7 @@
 package demo.aws.modules;
 
-import java.util.List;
-
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.kms.model.KeyListEntry;
-import software.amazon.awssdk.services.kms.model.KmsException;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
@@ -22,7 +18,7 @@ public class AwsSdk2Sqs {
 				  .build();
 	}
 	
-    public void queueList() throws KmsException {
+    public void queueList() {
     	
     	ListQueuesRequest request = ListQueuesRequest.builder()
                 .build();
