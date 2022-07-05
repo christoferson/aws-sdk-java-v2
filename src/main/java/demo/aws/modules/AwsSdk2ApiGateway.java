@@ -1,14 +1,27 @@
 package demo.aws.modules;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.apigateway.ApiGatewayClient;
 import software.amazon.awssdk.services.apigateway.model.ApiKey;
+import software.amazon.awssdk.services.apigateway.model.ApiStage;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyResponse;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysResponse;
-
+import software.amazon.awssdk.services.apigateway.model.GetUsagePlanKeysRequest;
+import software.amazon.awssdk.services.apigateway.model.GetUsagePlanKeysResponse;
+import software.amazon.awssdk.services.apigateway.model.GetUsagePlansRequest;
+import software.amazon.awssdk.services.apigateway.model.GetUsagePlansResponse;
+import software.amazon.awssdk.services.apigateway.model.UsagePlan;
+import software.amazon.awssdk.services.apigateway.model.UsagePlanKey;
+// https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html?icmpid=docs_apigateway_console
+// A usage plan specifies who can access one or more deployed API stages and methods—and optionally sets the target request rate to start throttling requests.
+//  The plan uses API keys to identify API clients and who can access the associated API stages for each key.
+// API keys are alphanumeric string values that you distribute to application developer customers to grant access to your API. 
+// An API key can be associated with more than one usage plan. A usage plan can be associated with more than one stage. 
+//  However, a given API key can only be associated with one usage plan for each stage of your API.
 public class AwsSdk2ApiGateway {
 
 	private ApiGatewayClient client;
@@ -56,5 +69,25 @@ public class AwsSdk2ApiGateway {
 
 	}
 	
+	public void usagePlanList() {
+
+		System.out.println(String.format("List UsagePlan"));
+		
+		GetUsagePlansRequest request = GetUsagePlansRequest.builder()
+				.build();
+
+		GetUsagePlansResponse result = client.getUsagePlans(request);
+		for (UsagePlan usagePlan : result.items()) {
+			System.out.println(String.format("ID=%s Name=%s Description=%s throttle=%s Quota=%s", 
+					usagePlan.id(), usagePlan.name(), usagePlan.description(), usagePlan.throttle(), usagePlan.quota()));
+			
+			for (ApiStage apiStage : usagePlan.apiStages()) {
+				System.out.println(String.format("  %s", apiStage));
+			}
+			
+		}
+
+	}
+
 	
 }
