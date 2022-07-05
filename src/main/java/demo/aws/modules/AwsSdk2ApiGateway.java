@@ -1,25 +1,13 @@
 package demo.aws.modules;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.List;
-
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.apigateway.ApiGatewayClient;
+import software.amazon.awssdk.services.apigateway.model.ApiKey;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyResponse;
-import software.amazon.awssdk.services.xray.XRayClient;
-import software.amazon.awssdk.services.xray.model.GetGroupsResponse;
-import software.amazon.awssdk.services.xray.model.GetServiceGraphRequest;
-import software.amazon.awssdk.services.xray.model.GetServiceGraphResponse;
-import software.amazon.awssdk.services.xray.model.GetTraceSummariesRequest;
-import software.amazon.awssdk.services.xray.model.GetTraceSummariesResponse;
-import software.amazon.awssdk.services.xray.model.GroupSummary;
-import software.amazon.awssdk.services.xray.model.ResourceARNDetail;
-import software.amazon.awssdk.services.xray.model.Service;
-import software.amazon.awssdk.services.xray.model.TraceSummary;
+import software.amazon.awssdk.services.apigateway.model.GetApiKeysRequest;
+import software.amazon.awssdk.services.apigateway.model.GetApiKeysResponse;
 
 public class AwsSdk2ApiGateway {
 
@@ -32,6 +20,25 @@ public class AwsSdk2ApiGateway {
 				  .region(region)
 				  .build();
 	}
+
+	public void apiKeyList() {
+
+		System.out.println(String.format("List ApiKey"));
+		
+		GetApiKeysRequest request = GetApiKeysRequest.builder()
+				.build();
+
+		GetApiKeysResponse result = client.getApiKeys(request);
+		for (ApiKey apiKey : result.items()) {
+			System.out.println(String.format("ID=%s Name=%s Description=%s CustomerId=%s", 
+					apiKey.id(), apiKey.name(), apiKey.description(), apiKey.customerId()));
+			for (String stageKey : apiKey.stageKeys()) {
+				System.out.println(String.format("  %s", stageKey));
+			}
+		}
+
+	}
+	
 	public void apiKeyGet(String keyId) {
 		
 		System.out.println(String.format("Get ApiKey"));
