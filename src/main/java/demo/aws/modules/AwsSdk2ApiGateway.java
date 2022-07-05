@@ -8,6 +8,8 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.apigateway.ApiGatewayClient;
+import software.amazon.awssdk.services.apigateway.model.GetApiKeyRequest;
+import software.amazon.awssdk.services.apigateway.model.GetApiKeyResponse;
 import software.amazon.awssdk.services.xray.XRayClient;
 import software.amazon.awssdk.services.xray.model.GetGroupsResponse;
 import software.amazon.awssdk.services.xray.model.GetServiceGraphRequest;
@@ -29,6 +31,22 @@ public class AwsSdk2ApiGateway {
 				  .credentialsProvider(credentialsProvider)
 				  .region(region)
 				  .build();
+	}
+	public void apiKeyGet(String keyId) {
+		
+		System.out.println(String.format("Get ApiKey"));
+		
+		GetApiKeyRequest request = GetApiKeyRequest.builder()
+				.apiKey(keyId)
+				.build();
+
+		GetApiKeyResponse result = client.getApiKey(request);
+		System.out.println(String.format("Name=%s Description=%s CustomerId=%s", result.name(), result.description(), result.customerId()));
+		
+		for (String stageKey : result.stageKeys()) {
+			System.out.println(String.format("  %s", stageKey));
+		}
+
 	}
 	
 	
