@@ -367,8 +367,6 @@ public class AwsSdk2DynamoDb {
 
 		itemValues.put(tableKey.getHashKeyName(), AttributeValue.builder().s(tableKey.getHashKey()).build());
 		itemValues.put(tableKey.getSortKeyName(), AttributeValue.builder().s(tableKey.getSortKey()).build());
-		//itemValues.put("Profession", AttributeValue.builder().s(profession).build());
-		//itemValues.put("Race", AttributeValue.builder().s(race).build());
 		itemValues.put("Version", AttributeValue.builder().s("1").build());
 		for (DynamoAttribute attribute : attributeList.items()) {
 			itemValues.put(attribute.name(), attribute.value());
@@ -436,6 +434,46 @@ public class AwsSdk2DynamoDb {
         System.out.println("Done!");
 
     }    
+    
+    public void itemEdit(DynamoTableKey tableKey, DynamoAttributeList attributeList, String version) 
+    		throws ResourceNotFoundException, DynamoDbException {
+
+    	System.out.println(tableKey);
+    	
+		HashMap<String, AttributeValue> itemKey = new HashMap<>();
+		itemKey.put(tableKey.getHashKeyName(), AttributeValue.builder().s(tableKey.getHashKey()).build());
+		itemKey.put(tableKey.getSortKeyName(), AttributeValue.builder().s(tableKey.getSortKey()).build());
+
+		String newVersion = String.valueOf(Long.valueOf(version) + 1);
+
+		HashMap<String, AttributeValue> itemValues = new HashMap<>();
+		//itemValues.put(":v_profession", AttributeValue.builder().s(profession).build());
+		//itemValues.put(":v_race", AttributeValue.builder().s(race).build());
+		itemValues.put(":v_version", AttributeValue.builder().s(newVersion).build());
+		itemValues.put(":v_current_version", AttributeValue.builder().s(version).build());
+		
+		StringBuilder updateExpression = new StringBuilder("SET Version = :v_version");
+		for (DynamoAttribute attribute : attributeList.items()) {
+			String placeholder = String.format(":v_%s", attribute.name().toLowerCase());
+			itemValues.put(placeholder, attribute.value());
+			updateExpression.append(String.format(", %s = %s", attribute.name(), placeholder));
+		}
+		System.out.println(updateExpression.toString());
+		System.out.println(itemValues);
+		
+        UpdateItemRequest request = UpdateItemRequest.builder()
+                .tableName(tableKey.getTableName())
+                .key(itemKey)
+                .updateExpression(updateExpression.toString())
+                .expressionAttributeValues(itemValues)
+                // software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
+                .conditionExpression("Version = :v_current_version") // Optimistic Locking
+                .build();
+
+        client.updateItem(request);
+        System.out.println("Done!");
+
+    }        
     
     public void itemDelete(String tableName, String partitionKey, String sortKey) throws DynamoDbException {
 
