@@ -114,4 +114,24 @@ public class AwsSdk2ApiGateway {
 
 	}
 	
+	public void usagePlanKeyList(String usagePlanId) {
+
+		System.out.println(String.format("List UsagePlanKeys"));
+		
+		GetUsagePlanKeysRequest request = GetUsagePlanKeysRequest.builder()
+				.usagePlanId(usagePlanId)
+				.build();
+
+		GetUsagePlanKeysResponse result = client.getUsagePlanKeys(request);
+		for (UsagePlanKey usagePlanKey : result.items()) {
+			System.out.println(String.format("ID=%s Name=%s Value=%s Type=%s", 
+					usagePlanKey.id(), usagePlanKey.name(), usagePlanKey.value(), usagePlanKey.type()));
+			
+		}
+
+	}
+	
+
+	
+	
 }
