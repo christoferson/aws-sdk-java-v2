@@ -59,5 +59,26 @@ public class AwsSdk2Xray {
         
 	}
 	
+	public void traceSummaryGet() {
+		
+		System.out.println(String.format("Get TraceSummary"));
+		
+		GetTraceSummariesRequest request = GetTraceSummariesRequest.builder()
+				.startTime(Instant.now().minus(3, ChronoUnit.HOURS))
+				.endTime(Instant.now())
+				.build();
+
+		GetTraceSummariesResponse result = client.getTraceSummaries(request);
+	    List<TraceSummary> list = result.traceSummaries();
+	
+	    for (TraceSummary element : list) {
+	        System.out.println(String.format("%s", element));
+	        for (ResourceARNDetail resource : element.resourceARNs()) {
+	        	System.out.println(String.format("   %s", resource));
+	        }
+	    }
+        
+	}
+	
 	
 }
