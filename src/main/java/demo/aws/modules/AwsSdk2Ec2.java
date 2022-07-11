@@ -52,7 +52,9 @@ public class AwsSdk2Ec2 {
 	    List<Reservation> list = result.reservations();
 	
 	    for (Reservation reservation : list) {
-	        System.out.println(String.format("%s", reservation));
+	    	if (reservation.hasInstances()) {
+	    		System.out.println(String.format("%s", reservation));
+	    	}
 	    }
         
 	}
