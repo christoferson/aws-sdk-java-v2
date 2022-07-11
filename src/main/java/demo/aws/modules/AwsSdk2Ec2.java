@@ -5,6 +5,9 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ec2.Ec2Client;
+import software.amazon.awssdk.services.ec2.model.Address;
+import software.amazon.awssdk.services.ec2.model.DescribeAddressesRequest;
+import software.amazon.awssdk.services.ec2.model.DescribeAddressesResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeImagesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeImagesResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest;
@@ -58,5 +61,21 @@ public class AwsSdk2Ec2 {
 	    }
         
 	}
+
+	public void addressesDescribe() {
+		
+		System.out.println(String.format("Describe Addresses"));
+		
+		DescribeAddressesRequest request = DescribeAddressesRequest.builder()
+				.build();
+
+		DescribeAddressesResponse result = client.describeAddresses(request);
+	    List<Address> list = result.addresses();
+	
+	    for (Address address : list) {
+	    	System.out.println(String.format("%s", address));
+	    }
+        
+	}	
 	
 }
