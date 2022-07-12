@@ -13,9 +13,12 @@ import software.amazon.awssdk.services.ec2.model.DescribeAvailabilityZonesReques
 import software.amazon.awssdk.services.ec2.model.DescribeAvailabilityZonesResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeImagesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeImagesResponse;
+import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusRequest;
+import software.amazon.awssdk.services.ec2.model.DescribeInstanceStatusResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
 import software.amazon.awssdk.services.ec2.model.Image;
+import software.amazon.awssdk.services.ec2.model.InstanceStatus;
 import software.amazon.awssdk.services.ec2.model.Reservation;
 
 
@@ -97,4 +100,19 @@ public class AwsSdk2Ec2 {
         
 	}	
 	
+	public void instanceStatusDescribe() {
+		
+		System.out.println(String.format("Describe InstanceStatus"));
+		
+		DescribeInstanceStatusRequest request = DescribeInstanceStatusRequest.builder()
+				.build();
+
+		DescribeInstanceStatusResponse result = client.describeInstanceStatus(request);
+	    List<InstanceStatus> list = result.instanceStatuses();
+	
+	    for (InstanceStatus element : list) {
+	    	System.out.println(String.format("%s", element));
+	    }
+        
+	}	
 }
