@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.apigateway.model.GetApiKeysRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysResponse;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlanKeysRequest;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlanKeysResponse;
+import software.amazon.awssdk.services.apigateway.model.GetUsagePlanRequest;
+import software.amazon.awssdk.services.apigateway.model.GetUsagePlanResponse;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlansRequest;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlansResponse;
 import software.amazon.awssdk.services.apigateway.model.UsagePlan;
@@ -103,13 +105,33 @@ public class AwsSdk2ApiGateway {
 
 		GetUsagePlansResponse result = client.getUsagePlans(request);
 		for (UsagePlan usagePlan : result.items()) {
-			System.out.println(String.format("ID=%s Name=%s Description=%s throttle=%s Quota=%s", 
+			System.out.println(String.format("ID=%s Name=%s Description=%s %n  Throttle=%s %n  Quota=%s", 
 					usagePlan.id(), usagePlan.name(), usagePlan.description(), usagePlan.throttle(), usagePlan.quota()));
 			
 			for (ApiStage apiStage : usagePlan.apiStages()) {
 				System.out.println(String.format("  %s", apiStage));
 			}
 			
+		}
+
+	}
+	
+	public void usagePlanGet(String usagePlanId) {
+
+		System.out.println(String.format("Get UsagePlan - ID=%s", usagePlanId));
+		
+		GetUsagePlanRequest request = GetUsagePlanRequest.builder()
+				.usagePlanId(usagePlanId)
+				.build();
+
+		GetUsagePlanResponse result = client.getUsagePlan(request);
+		GetUsagePlanResponse usagePlan = result;
+		
+		System.out.println(String.format("ID=%s Name=%s Description=%s %n  Throttle=%s %n  Quota=%s", 
+				usagePlan.id(), usagePlan.name(), usagePlan.description(), usagePlan.throttle(), usagePlan.quota()));
+		
+		for (ApiStage apiStage : usagePlan.apiStages()) {
+			System.out.println(String.format("    %s", apiStage));
 		}
 
 	}
@@ -133,5 +155,6 @@ public class AwsSdk2ApiGateway {
 	
 
 	
+
 	
 }
