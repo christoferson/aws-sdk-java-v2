@@ -155,6 +155,23 @@ public class AwsSdk2ApiGateway {
 	
 
 	
+	public void usagePlanKeyCreate(String usagePlanId, String keyId) { //Add existing key to usage plan
 
+		System.out.println(String.format("Create UsagePlanKey"));
+		
+		CreateUsagePlanKeyRequest request = CreateUsagePlanKeyRequest.builder()
+				.usagePlanId(usagePlanId)
+				.keyId(keyId)
+				.keyType("API_KEY")
+				.build();
+
+		CreateUsagePlanKeyResponse result = client.createUsagePlanKey(request);
+		
+		CreateUsagePlanKeyResponse usagePlanKey = result;
+		System.out.println(String.format("ID=%s Name=%s Value=%s Type=%s", 
+				usagePlanKey.id(), usagePlanKey.name(), usagePlanKey.value(), usagePlanKey.type()));
+			
+
+	}
 	
 }
