@@ -1,7 +1,7 @@
 package demo.aws.modules;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-
+import software.amazon.awssdk.core.SdkField;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.apigateway.ApiGatewayClient;
 import software.amazon.awssdk.services.apigateway.model.ApiKey;
@@ -16,12 +16,15 @@ import software.amazon.awssdk.services.apigateway.model.GetApiKeyRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyResponse;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysResponse;
+import software.amazon.awssdk.services.apigateway.model.GetRestApisRequest;
+import software.amazon.awssdk.services.apigateway.model.GetRestApisResponse;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlanKeysRequest;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlanKeysResponse;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlanRequest;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlanResponse;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlansRequest;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlansResponse;
+import software.amazon.awssdk.services.apigateway.model.RestApi;
 import software.amazon.awssdk.services.apigateway.model.UsagePlan;
 import software.amazon.awssdk.services.apigateway.model.UsagePlanKey;
 
@@ -56,8 +59,22 @@ public class AwsSdk2ApiGateway {
 		GetAccountResponse result = client.getAccount(request);
 		System.out.println(String.format("ApiKeyVersion=%s %nCloudwatchRoleArn=%s %nThrottleSettings=%s", 
 				result.apiKeyVersion(), result.cloudwatchRoleArn(), result.throttleSettings()));
-		
+	}
+	
+	public void restApiList() {
 
+		System.out.println(String.format("List RestApi"));
+		
+		GetRestApisRequest request = GetRestApisRequest.builder()
+				.build();
+
+		GetRestApisResponse result = client.getRestApis(request);
+		for (RestApi api : result.items()) {
+			System.out.println(String.format("ID=%s Name=%s Description=%s", 
+					api.id(), api.name(), api.description()));
+		}
+		
+	
 	}
 	
 	public void apiKeyList() {
