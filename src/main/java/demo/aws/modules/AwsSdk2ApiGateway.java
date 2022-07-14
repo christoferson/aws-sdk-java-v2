@@ -10,6 +10,8 @@ import software.amazon.awssdk.services.apigateway.model.CreateApiKeyRequest;
 import software.amazon.awssdk.services.apigateway.model.CreateApiKeyResponse;
 import software.amazon.awssdk.services.apigateway.model.CreateUsagePlanKeyRequest;
 import software.amazon.awssdk.services.apigateway.model.CreateUsagePlanKeyResponse;
+import software.amazon.awssdk.services.apigateway.model.GetAccountRequest;
+import software.amazon.awssdk.services.apigateway.model.GetAccountResponse;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyResponse;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysRequest;
@@ -44,6 +46,20 @@ public class AwsSdk2ApiGateway {
 				  .build();
 	}
 
+	public void accountGet() {
+
+		System.out.println(String.format("Get Account"));
+		
+		GetAccountRequest request = GetAccountRequest.builder()
+				.build();
+
+		GetAccountResponse result = client.getAccount(request);
+		System.out.println(String.format("ApiKeyVersion=%s %nCloudwatchRoleArn=%s %nThrottleSettings=%s", 
+				result.apiKeyVersion(), result.cloudwatchRoleArn(), result.throttleSettings()));
+		
+
+	}
+	
 	public void apiKeyList() {
 
 		System.out.println(String.format("List ApiKey"));
