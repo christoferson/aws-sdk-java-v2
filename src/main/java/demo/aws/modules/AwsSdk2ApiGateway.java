@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.apigateway.model.GetApiKeyRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeyResponse;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysRequest;
 import software.amazon.awssdk.services.apigateway.model.GetApiKeysResponse;
+import software.amazon.awssdk.services.apigateway.model.GetRestApiRequest;
+import software.amazon.awssdk.services.apigateway.model.GetRestApiResponse;
 import software.amazon.awssdk.services.apigateway.model.GetRestApisRequest;
 import software.amazon.awssdk.services.apigateway.model.GetRestApisResponse;
 import software.amazon.awssdk.services.apigateway.model.GetUsagePlanKeysRequest;
@@ -73,9 +75,23 @@ public class AwsSdk2ApiGateway {
 			System.out.println(String.format("ID=%s Name=%s Description=%s", 
 					api.id(), api.name(), api.description()));
 		}
-		
 	
 	}
+
+	public void restApiGet(String restApiId) {
+
+		System.out.println(String.format("Get RestApi"));
+		
+		GetRestApiRequest request = GetRestApiRequest.builder()
+				.restApiId(restApiId)
+				.build();
+
+		GetRestApiResponse result = client.getRestApi(request);
+		GetRestApiResponse api = result;
+		System.out.println(String.format("ID=%s Name=%s Description=%s Endpoint=%s", 
+				api.id(), api.name(), api.description(), api.endpointConfiguration()));
+	}
+
 	
 	public void apiKeyList() {
 
