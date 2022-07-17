@@ -7,6 +7,7 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -37,7 +38,7 @@ public class AwsSdk2Sqs {
         }
 
     }
-
+    
     public void messageReceiveLongPolling(String queueUrl) {
 		
 		System.out.println(String.format("Queue:%s Receiving Message (Long)...", queueUrl));
@@ -58,9 +59,13 @@ public class AwsSdk2Sqs {
 			System.out.println("   " + m.attributesAsStrings());
 		}
 		// Delete Messages after Receipt
-		//for (Message m : messages) {
-		//	client.deleteMessage(queueUrl, m.getReceiptHandle());
-		//}
+		for (Message m : messages) {
+			DeleteMessageRequest deleteRequest = DeleteMessageRequest.builder()
+					.queueUrl(queueUrl)
+					.receiptHandle(m.receiptHandle())
+					.build();
+			client.deleteMessage(deleteRequest);
+		}
 		
 	}
 
