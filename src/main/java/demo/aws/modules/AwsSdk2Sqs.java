@@ -7,12 +7,19 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
+import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityResponse;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
+// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_Operations.html
+// Delete Message
+// GetQueueUrl m-queue
+// ListQueues
+// PurgeQueue
 public class AwsSdk2Sqs {
 
 	private SqsClient client;
@@ -49,6 +56,7 @@ public class AwsSdk2Sqs {
 				//When the wait time for the ReceiveMessage API action is greater than 0, long polling is in effect. 
 				//The maximum long polling wait time is 20 seconds.
 				.waitTimeSeconds(20)
+				.visibilityTimeout(30)
 				.build();
 		
 		List<Message> messages = client.receiveMessage(request).messages();
@@ -68,5 +76,19 @@ public class AwsSdk2Sqs {
 		}
 		
 	}
+    
+    public void messageVisibilityTimeoutChange(String queueUrl, String messageReceiptHandle, Integer visibilityTimeout) {
+		
+		System.out.println(String.format("Queue:%s Message:%s Change MessageVisibility (Integer)...", queueUrl, messageReceiptHandle));
+		
+		ChangeMessageVisibilityRequest request = ChangeMessageVisibilityRequest.builder()
+				.queueUrl(queueUrl)
+				.receiptHandle(messageReceiptHandle)
+				.visibilityTimeout(visibilityTimeout)
+				.build();
+		
+		ChangeMessageVisibilityResponse response = client.changeMessageVisibility(request);
+		
+	}    
 
 }
