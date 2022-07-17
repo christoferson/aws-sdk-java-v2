@@ -44,6 +44,11 @@
 
           <dependency>
             <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ec2</artifactId>
+          </dependency>
+                    
+          <dependency>
+            <groupId>software.amazon.awssdk</groupId>
             <artifactId>kms</artifactId>
           </dependency>
     
@@ -96,7 +101,12 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>apigateway</artifactId>
         </dependency>
-             
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sts</artifactId>
+        </dependency>
+                     
         <!--  Others -->
 		
     
