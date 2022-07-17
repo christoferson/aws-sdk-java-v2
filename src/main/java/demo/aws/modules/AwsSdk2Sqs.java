@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
 import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityResponse;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -89,6 +90,19 @@ public class AwsSdk2Sqs {
 		
 		ChangeMessageVisibilityResponse response = client.changeMessageVisibility(request);
 		
-	}    
+	}
+
+    public void messageDelete(String queueUrl, String messageReceiptHandle) {
+
+		System.out.println(String.format("Queue:%s Message:%s Delete Message...", queueUrl, messageReceiptHandle));
+		
+		DeleteMessageRequest request = DeleteMessageRequest.builder()
+				.queueUrl(queueUrl)
+				.receiptHandle(messageReceiptHandle)
+				.build();
+		
+		DeleteMessageResponse response = client.deleteMessage(request);
+
+	}
 
 }
