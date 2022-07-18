@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
 import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityResponse;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -44,6 +46,20 @@ public class AwsSdk2Sqs {
         for (String url : response.queueUrls()) {
             System.out.println(String.format("%s", url));
         }
+
+    }
+	
+    public void queueUrlGet(String queueName) {
+
+    	System.out.println(String.format("Get Queue URL..."));
+    	
+    	GetQueueUrlRequest request = GetQueueUrlRequest.builder()
+    			//.queueOwnerAWSAccountId(null)
+    			.queueName(queueName)
+                .build();
+
+    	GetQueueUrlResponse response = client.getQueueUrl(request);
+        System.out.println(String.format("%s", response.queueUrl()));
 
     }
     
