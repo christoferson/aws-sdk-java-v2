@@ -16,12 +16,12 @@ import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest;
+import software.amazon.awssdk.services.sqs.model.PurgeQueueResponse;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_Operations.html
-// Delete Message
 // GetQueueUrl m-queue
-// ListQueues
 // PurgeQueue
 public class AwsSdk2Sqs {
 
@@ -60,6 +60,18 @@ public class AwsSdk2Sqs {
 
     	GetQueueUrlResponse response = client.getQueueUrl(request);
         System.out.println(String.format("%s", response.queueUrl()));
+
+    }
+
+    public void queuePurge(String queueUrl) {
+
+    	System.out.println(String.format("Purge Queue..."));
+    	
+    	PurgeQueueRequest request = PurgeQueueRequest.builder()
+    			.queueUrl(queueUrl)
+                .build();
+
+    	PurgeQueueResponse response = client.purgeQueue(request);
 
     }
     
