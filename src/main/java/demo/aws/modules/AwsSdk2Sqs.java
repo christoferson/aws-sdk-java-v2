@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
 import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityResponse;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesResponse;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
@@ -21,8 +23,6 @@ import software.amazon.awssdk.services.sqs.model.PurgeQueueResponse;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_Operations.html
-// GetQueueUrl m-queue
-// PurgeQueue
 public class AwsSdk2Sqs {
 
 	private SqsClient client;
@@ -62,6 +62,22 @@ public class AwsSdk2Sqs {
         System.out.println(String.format("%s", response.queueUrl()));
 
     }
+    
+    public void queueGetAttributes(String queueUrl, List<String> attrubuteNameList) {
+
+    	System.out.println(String.format("Get QueueAttributes..."));
+    	
+    	GetQueueAttributesRequest request = GetQueueAttributesRequest.builder()
+    			.queueUrl(queueUrl)
+    			.attributeNamesWithStrings(attrubuteNameList)
+                .build();
+
+    	GetQueueAttributesResponse response = client.getQueueAttributes(request);
+        response.attributesAsStrings().forEach((k, v) -> {
+        	System.out.println(String.format("   %s %s", k, v));
+        });
+
+    }    
 
     public void queuePurge(String queueUrl) {
 
