@@ -1,14 +1,15 @@
 package demo.aws.modules;
 
 import java.util.List;
-
-
+import java.util.Map;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityRequest;
 import software.amazon.awssdk.services.sqs.model.ChangeMessageVisibilityResponse;
+import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
+import software.amazon.awssdk.services.sqs.model.CreateQueueResponse;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
 import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
@@ -46,6 +47,21 @@ public class AwsSdk2Sqs {
         for (String url : response.queueUrls()) {
             System.out.println(String.format("%s", url));
         }
+
+    }
+    
+    public void queueCreate(String queueName, Map<String, String> attributes, Map<String, String> tags) {
+
+    	System.out.println(String.format("Listing Queues..."));
+    	
+    	CreateQueueRequest request = CreateQueueRequest.builder()
+    			.queueName(queueName)
+    			.attributesWithStrings(attributes)
+    			.tags(tags)
+                .build();
+
+    	CreateQueueResponse response = client.createQueue(request);
+            System.out.println(String.format("%s", response.queueUrl()));
 
     }
 	
