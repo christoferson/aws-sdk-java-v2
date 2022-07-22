@@ -12,6 +12,8 @@ import software.amazon.awssdk.services.sqs.model.CreateQueueRequest;
 import software.amazon.awssdk.services.sqs.model.CreateQueueResponse;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
+import software.amazon.awssdk.services.sqs.model.DeleteQueueRequest;
+import software.amazon.awssdk.services.sqs.model.DeleteQueueResponse;
 import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
 import software.amazon.awssdk.services.sqs.model.GetQueueAttributesResponse;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
@@ -52,7 +54,7 @@ public class AwsSdk2Sqs {
     
     public void queueCreate(String queueName, Map<String, String> attributes, Map<String, String> tags) {
 
-    	System.out.println(String.format("Listing Queues..."));
+    	System.out.println(String.format("Create Queue..."));
     	
     	CreateQueueRequest request = CreateQueueRequest.builder()
     			.queueName(queueName)
@@ -61,9 +63,22 @@ public class AwsSdk2Sqs {
                 .build();
 
     	CreateQueueResponse response = client.createQueue(request);
-            System.out.println(String.format("%s", response.queueUrl()));
+        System.out.println(String.format("%s", response.queueUrl()));
 
     }
+    
+    public void queueDelete(String queueUrl) {
+
+    	System.out.println(String.format("Delete Queue..."));
+    	
+    	DeleteQueueRequest request = DeleteQueueRequest.builder()
+    			.queueUrl(queueUrl)
+                .build();
+
+    	DeleteQueueResponse response = client.deleteQueue(request);
+        System.out.println(String.format("%s", response));
+
+    }    
 	
     public void queueUrlGet(String queueName) {
 
