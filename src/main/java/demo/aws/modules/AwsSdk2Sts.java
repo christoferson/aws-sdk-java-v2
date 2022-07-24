@@ -1,6 +1,7 @@
 package demo.aws.modules;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.apigateway.ApiGatewayClient;
 import software.amazon.awssdk.services.apigateway.model.ApiKey;
@@ -29,6 +30,9 @@ import software.amazon.awssdk.services.apigateway.model.RestApi;
 import software.amazon.awssdk.services.apigateway.model.UsagePlan;
 import software.amazon.awssdk.services.apigateway.model.UsagePlanKey;
 import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
+import software.amazon.awssdk.services.sts.model.AssumeRoleResponse;
+import software.amazon.awssdk.services.sts.model.Credentials;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 
@@ -57,5 +61,23 @@ public class AwsSdk2Sts {
 
 	}
 
+	public void assumeRole(String roleArn) {
+
+		System.out.println(String.format("Assume Role"));
+		
+		AssumeRoleRequest request = AssumeRoleRequest.builder()
+				.roleArn(roleArn)
+				.roleSessionName(String.valueOf(System.currentTimeMillis()))
+				.build();
+
+		AssumeRoleResponse result = client.assumeRole(request);
+		Credentials credentials = result.credentials();
+		System.out.println(String.format("Result=%s", result));
+		System.out.println(String.format("AccessKey=%s", credentials.accessKeyId()));
+		System.out.println(String.format("Secret=%s", credentials.secretAccessKey()));
+		System.out.println(String.format("SessionToken=%s", credentials.sessionToken()));
+		System.out.println(String.format("Expiration=%s", credentials.expiration()));
+		//AwsSessionCredentials session = AwsSessionCredentials.create(credentials.accessKeyId(), credentials.secretAccessKey(), credentials.sessionToken());
+	}
 	
 }
