@@ -18,6 +18,8 @@ import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
 import software.amazon.awssdk.services.sqs.model.GetQueueAttributesResponse;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
+import software.amazon.awssdk.services.sqs.model.ListDeadLetterSourceQueuesRequest;
+import software.amazon.awssdk.services.sqs.model.ListDeadLetterSourceQueuesResponse;
 import software.amazon.awssdk.services.sqs.model.ListQueuesRequest;
 import software.amazon.awssdk.services.sqs.model.ListQueuesResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -110,6 +112,21 @@ public class AwsSdk2Sqs {
 
     }    
 
+    public void queueListDeadLetterQueues(String queueUrl) {
+
+    	System.out.println(String.format("List DeadLetterQueues..."));
+    	
+    	ListDeadLetterSourceQueuesRequest request = ListDeadLetterSourceQueuesRequest.builder()
+    			.queueUrl(queueUrl)
+                .build();
+
+    	ListDeadLetterSourceQueuesResponse response = client.listDeadLetterSourceQueues(request);
+        response.queueUrls().forEach((url) -> {
+        	System.out.println(String.format("   %s", url));
+        });
+
+    }  
+    
     public void queuePurge(String queueUrl) {
 
     	System.out.println(String.format("Purge Queue..."));
