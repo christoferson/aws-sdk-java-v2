@@ -1,9 +1,8 @@
 package demo.aws.modules;
 
-import java.nio.ByteBuffer;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
@@ -15,6 +14,8 @@ import software.amazon.awssdk.services.kms.model.CreateAliasResponse;
 import software.amazon.awssdk.services.kms.model.DataKeySpec;
 import software.amazon.awssdk.services.kms.model.DecryptRequest;
 import software.amazon.awssdk.services.kms.model.DecryptResponse;
+import software.amazon.awssdk.services.kms.model.DeleteAliasRequest;
+import software.amazon.awssdk.services.kms.model.DeleteAliasResponse;
 import software.amazon.awssdk.services.kms.model.DescribeKeyRequest;
 import software.amazon.awssdk.services.kms.model.DescribeKeyResponse;
 import software.amazon.awssdk.services.kms.model.EncryptRequest;
@@ -87,7 +88,7 @@ public class AwsSdk2Kms {
     	System.out.printf("Listing Alias for Key = %s ... %n", keyId);
     	
         ListAliasesRequest aliasesRequest = ListAliasesRequest.builder()
-            .limit(2)
+            .limit(5)
             .keyId(keyId)
             .build();
 
@@ -109,6 +110,17 @@ public class AwsSdk2Kms {
 
 		CreateAliasResponse response = client.createAlias(aliasRequest);
 		System.out.println(String.format("Created Alias: Alias=%s Key=%s Response=%s", aliasName, targetKeyId, response));
+		
+	}
+	
+	public void aliasDelete(String aliasName) throws KmsException {
+
+		DeleteAliasRequest aliasRequest = DeleteAliasRequest.builder()
+				.aliasName(aliasName)
+				.build();
+
+		DeleteAliasResponse response = client.deleteAlias(aliasRequest);
+		System.out.println(String.format("Deleted Alias: Alias=%s Response=%s", aliasName, response));
 		
 	}
     
@@ -213,10 +225,9 @@ public class AwsSdk2Kms {
             encryptedKey,
             plaintextKey
         );
-        
 
 		return encryptedKey.asByteArray();
 
 	}
-	
+
 }
