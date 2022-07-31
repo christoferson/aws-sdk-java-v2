@@ -9,6 +9,8 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretRequest;
+import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretResponse;
 import software.amazon.awssdk.services.secretsmanager.model.ListSecretsRequest;
 import software.amazon.awssdk.services.secretsmanager.model.ListSecretsResponse;
 import software.amazon.awssdk.services.secretsmanager.model.SecretListEntry;
@@ -40,5 +42,16 @@ public class AwsSdk2SecretsManager {
 
     }	
 
+    public void secretDescribe(String secretId) {
 
+    	System.out.printf("Describe Secret ... %n");
+    	
+    	DescribeSecretRequest request = DescribeSecretRequest.builder()
+    			.secretId(secretId)
+                .build();
+
+    	DescribeSecretResponse response = client.describeSecret(request);
+        System.out.println(String.format("%s %s", response.name(), response.description()));
+
+    }	
 }
