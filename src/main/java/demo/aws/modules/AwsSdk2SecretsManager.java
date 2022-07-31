@@ -11,6 +11,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretRequest;
 import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretResponse;
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 import software.amazon.awssdk.services.secretsmanager.model.ListSecretsRequest;
 import software.amazon.awssdk.services.secretsmanager.model.ListSecretsResponse;
 import software.amazon.awssdk.services.secretsmanager.model.SecretListEntry;
@@ -53,5 +55,19 @@ public class AwsSdk2SecretsManager {
     	DescribeSecretResponse response = client.describeSecret(request);
         System.out.println(String.format("%s %s", response.name(), response.description()));
 
-    }	
+    }
+
+    public void secretValueGet(String secretId) {
+
+    	System.out.printf("Get Secret Value ... %n");
+    	
+    	GetSecretValueRequest request = GetSecretValueRequest.builder()
+    			.secretId(secretId)
+                .build();
+
+    	GetSecretValueResponse response = client.getSecretValue(request);
+        System.out.println(String.format("%s %s", response.name(), response.secretString()));
+
+    }
+    
 }
