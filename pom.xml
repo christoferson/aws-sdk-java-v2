@@ -116,7 +116,12 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>rds</artifactId>
         </dependency>
-                             
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>batch</artifactId>
+        </dependency>
+                                     
         <!--  Others -->
 		
     
