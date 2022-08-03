@@ -7,6 +7,9 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.batch.BatchClient;
+import software.amazon.awssdk.services.batch.model.JobSummary;
+import software.amazon.awssdk.services.batch.model.ListJobsRequest;
+import software.amazon.awssdk.services.batch.model.ListJobsResponse;
 import software.amazon.awssdk.services.kms.model.KeyListEntry;
 import software.amazon.awssdk.services.kms.model.ListKeysRequest;
 import software.amazon.awssdk.services.kms.model.ListKeysResponse;
@@ -37,7 +40,22 @@ public class AwsSdk2Batch {
 				  .build();
 	}
 	
+	public void jobList(String jobQueue) {
 
+    	System.out.printf("List Job ... %n");
+    	
+    	ListJobsRequest request = ListJobsRequest.builder()
+    			.jobQueue(jobQueue)
+                .build();
+
+    	ListJobsResponse response = client.listJobs(request);
+        List<JobSummary> elements = response.jobSummaryList();
+        for (JobSummary element : elements) {
+            System.out.println(String.format("Arn=%s Name=%s Def=%s ID=%s", 
+            		element.jobArn(), element.jobName(), element.jobDefinition(), element.jobId()));
+        }
+        
+	}
 
 	
 }
