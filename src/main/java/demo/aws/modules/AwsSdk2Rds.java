@@ -48,9 +48,35 @@ public class AwsSdk2Rds {
     	DescribeDbInstancesResponse response = client.describeDBInstances(request);
         List<DBInstance> elements = response.dbInstances();
         for (DBInstance element : elements) {
-            System.out.println(String.format("Arn=%s Name=%s Engine=%s EngineVer=%s Endpoint=%s MultiAz=%s", element.dbInstanceArn(), element.dbName(), element.engine(), 
-            		element.engineVersion(), element.endpoint().address(),
+            System.out.println(String.format("Arn=%s %n  Name=%s ID=%s %n  Engine=%s EngineVer=%s %n  Endpoint=%s %n  MultiAz=%s", 
+            		element.dbInstanceArn(), element.dbName(), element.dbInstanceIdentifier(),
+            		element.engine(), 
+            		element.engineVersion(), 
+            		element.endpoint().address(),
             		element.multiAZ()));
+        }
+        
+	}
+
+	public void instanceDescribe(String instanceIdentifier) {
+
+    	System.out.printf("Describe Database Instance ... %n");
+    	
+    	DescribeDbInstancesRequest request = DescribeDbInstancesRequest.builder()
+    			.dbInstanceIdentifier(instanceIdentifier)
+                .build();
+
+    	DescribeDbInstancesResponse response = client.describeDBInstances(request);
+    	List<DBInstance> elements = response.dbInstances();
+        for (DBInstance element : elements) {
+            System.out.println(String.format("Arn=%s %n  Name=%s ID=%s %n  Engine=%s EngineVer=%s %n  Endpoint=%s %n  Status=%s MultiAz=%s", 
+            		element.dbInstanceArn(), element.dbName(), element.dbInstanceIdentifier(),
+            		element.engine(), 
+            		element.engineVersion(), 
+            		element.endpoint().address(),
+            		element.dbInstanceStatus(),
+            		element.multiAZ()));
+            
         }
         
 	}
