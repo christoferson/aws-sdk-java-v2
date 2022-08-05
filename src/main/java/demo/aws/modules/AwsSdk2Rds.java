@@ -13,6 +13,8 @@ import software.amazon.awssdk.services.rds.RdsClient;
 import software.amazon.awssdk.services.rds.model.DBInstance;
 import software.amazon.awssdk.services.rds.model.DescribeDbInstancesRequest;
 import software.amazon.awssdk.services.rds.model.DescribeDbInstancesResponse;
+import software.amazon.awssdk.services.rds.model.StartDbInstanceRequest;
+import software.amazon.awssdk.services.rds.model.StartDbInstanceResponse;
 import software.amazon.awssdk.services.xray.XRayClient;
 import software.amazon.awssdk.services.xray.model.GetGroupsResponse;
 import software.amazon.awssdk.services.xray.model.GetServiceGraphRequest;
@@ -52,6 +54,20 @@ public class AwsSdk2Rds {
         }
         
 	}
+	
+	public void instanceStart(String instanceIdentifier) {
+
+    	System.out.printf("Start Database Instance ... %n");
+    	
+    	StartDbInstanceRequest request = StartDbInstanceRequest.builder()
+    			.dbInstanceIdentifier(instanceIdentifier)
+                .build();
+
+    	StartDbInstanceResponse response = client.startDBInstance(request);
+    	DBInstance element = response.dbInstance();
+        System.out.println(String.format("Started Arn=%s Name=%s", element.dbInstanceArn(), element.dbName()));
+        
+	}	
 
 	
 }
