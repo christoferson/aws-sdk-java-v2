@@ -15,6 +15,8 @@ import software.amazon.awssdk.services.rds.model.DescribeDbInstancesRequest;
 import software.amazon.awssdk.services.rds.model.DescribeDbInstancesResponse;
 import software.amazon.awssdk.services.rds.model.StartDbInstanceRequest;
 import software.amazon.awssdk.services.rds.model.StartDbInstanceResponse;
+import software.amazon.awssdk.services.rds.model.StopDbInstanceRequest;
+import software.amazon.awssdk.services.rds.model.StopDbInstanceResponse;
 import software.amazon.awssdk.services.xray.XRayClient;
 import software.amazon.awssdk.services.xray.model.GetGroupsResponse;
 import software.amazon.awssdk.services.xray.model.GetServiceGraphRequest;
@@ -91,9 +93,23 @@ public class AwsSdk2Rds {
 
     	StartDbInstanceResponse response = client.startDBInstance(request);
     	DBInstance element = response.dbInstance();
-        System.out.println(String.format("Started Arn=%s Name=%s", element.dbInstanceArn(), element.dbName()));
+        System.out.println(String.format("Started Arn=%s Name=%s ID=%s", element.dbInstanceArn(), element.dbName(), element.dbInstanceIdentifier()));
         
 	}	
 
+
+	public void instanceStop(String instanceIdentifier) {
+
+    	System.out.printf("Stop Database Instance ... %n");
+    	
+    	StopDbInstanceRequest request = StopDbInstanceRequest.builder()
+    			.dbInstanceIdentifier(instanceIdentifier)
+                .build();
+
+    	StopDbInstanceResponse response = client.stopDBInstance(request);
+    	DBInstance element = response.dbInstance();
+        System.out.println(String.format("Stopped Arn=%s Name=%s ID=%s", element.dbInstanceArn(), element.dbName(), element.dbInstanceIdentifier()));
+        
+	}
 	
 }
