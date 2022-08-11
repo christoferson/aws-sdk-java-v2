@@ -7,26 +7,20 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.batch.BatchClient;
+import software.amazon.awssdk.services.batch.model.ComputeEnvironmentDetail;
+import software.amazon.awssdk.services.batch.model.DescribeComputeEnvironmentsRequest;
+import software.amazon.awssdk.services.batch.model.DescribeComputeEnvironmentsResponse;
+import software.amazon.awssdk.services.batch.model.DescribeJobDefinitionsRequest;
+import software.amazon.awssdk.services.batch.model.DescribeJobDefinitionsResponse;
+import software.amazon.awssdk.services.batch.model.DescribeJobQueuesRequest;
+import software.amazon.awssdk.services.batch.model.DescribeJobQueuesResponse;
+import software.amazon.awssdk.services.batch.model.JobDefinition;
+import software.amazon.awssdk.services.batch.model.JobQueueDetail;
+import software.amazon.awssdk.services.batch.model.JobStatus;
 import software.amazon.awssdk.services.batch.model.JobSummary;
 import software.amazon.awssdk.services.batch.model.ListJobsRequest;
 import software.amazon.awssdk.services.batch.model.ListJobsResponse;
-import software.amazon.awssdk.services.kms.model.KeyListEntry;
-import software.amazon.awssdk.services.kms.model.ListKeysRequest;
-import software.amazon.awssdk.services.kms.model.ListKeysResponse;
-import software.amazon.awssdk.services.rds.RdsClient;
-import software.amazon.awssdk.services.rds.model.DBInstance;
-import software.amazon.awssdk.services.rds.model.DescribeDbInstancesRequest;
-import software.amazon.awssdk.services.rds.model.DescribeDbInstancesResponse;
-import software.amazon.awssdk.services.xray.XRayClient;
-import software.amazon.awssdk.services.xray.model.GetGroupsResponse;
-import software.amazon.awssdk.services.xray.model.GetServiceGraphRequest;
-import software.amazon.awssdk.services.xray.model.GetServiceGraphResponse;
-import software.amazon.awssdk.services.xray.model.GetTraceSummariesRequest;
-import software.amazon.awssdk.services.xray.model.GetTraceSummariesResponse;
-import software.amazon.awssdk.services.xray.model.GroupSummary;
-import software.amazon.awssdk.services.xray.model.ResourceARNDetail;
-import software.amazon.awssdk.services.xray.model.Service;
-import software.amazon.awssdk.services.xray.model.TraceSummary;
+
 
 public class AwsSdk2Batch {
 
@@ -40,12 +34,12 @@ public class AwsSdk2Batch {
 				  .build();
 	}
 	
-	public void jobList(String jobQueue) {
+	public void jobList(String jobQueue, JobStatus jobStatus) {
 
-    	System.out.printf("List Job ... %n");
+    	System.out.printf("List Job Queue=%s State=%s... %n", jobQueue, jobStatus);
     	
     	ListJobsRequest request = ListJobsRequest.builder()
-    			.jobQueue(jobQueue)
+    			.jobQueue(jobQueue).jobStatus(jobStatus)
                 .build();
 
     	ListJobsResponse response = client.listJobs(request);
