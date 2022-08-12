@@ -51,5 +51,21 @@ public class AwsSdk2Batch {
         
 	}
 
+	public void computeEnvironmentDescribe() {
+
+    	System.out.printf("Describe ComputeEnvironment ... %n");
+    	
+    	DescribeComputeEnvironmentsRequest request = DescribeComputeEnvironmentsRequest.builder()
+                .build();
+
+    	DescribeComputeEnvironmentsResponse response = client.describeComputeEnvironments(request);
+        List<ComputeEnvironmentDetail> elements = response.computeEnvironments();
+        for (ComputeEnvironmentDetail element : elements) {
+            System.out.println(String.format("Arn=%s Name=%s", 
+            		element.computeEnvironmentArn(), element.computeEnvironmentName()));
+        }
+        
+	}
+	
 	
 }
