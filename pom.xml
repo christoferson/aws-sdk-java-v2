@@ -121,7 +121,12 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>batch</artifactId>
         </dependency>
-                                     
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sfn</artifactId>
+        </dependency>
+                   
         <!--  Others -->
 		
     
