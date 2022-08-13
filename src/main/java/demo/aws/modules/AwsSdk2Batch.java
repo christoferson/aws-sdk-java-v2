@@ -67,5 +67,20 @@ public class AwsSdk2Batch {
         
 	}
 	
+	public void jobQueueDescribe() {
+
+    	System.out.printf("Describe JobQueue ... %n");
+    	
+    	DescribeJobQueuesRequest request = DescribeJobQueuesRequest.builder()
+                .build();
+
+    	DescribeJobQueuesResponse response = client.describeJobQueues(request);
+        List<JobQueueDetail> elements = response.jobQueues();
+        for (JobQueueDetail element : elements) {
+            System.out.println(String.format("Arn=%s Name=%s", 
+            		element.jobQueueArn(), element.jobQueueName()));
+        }
+        
+	}
 	
 }
