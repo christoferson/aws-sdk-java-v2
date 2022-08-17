@@ -83,4 +83,20 @@ public class AwsSdk2Batch {
         
 	}
 	
+	public void jobDefinitionDescribe() {
+
+    	System.out.printf("Describe JobDefinition ... %n");
+    	
+    	DescribeJobDefinitionsRequest request = DescribeJobDefinitionsRequest.builder()
+                .build();
+
+    	DescribeJobDefinitionsResponse response = client.describeJobDefinitions(request);
+        List<JobDefinition> elements = response.jobDefinitions();
+        for (JobDefinition element : elements) {
+            System.out.println(String.format("Arn=%s Name=%s", 
+            		element.jobDefinitionArn(), element.jobDefinitionName()));
+        }
+        
+	}
+	
 }
