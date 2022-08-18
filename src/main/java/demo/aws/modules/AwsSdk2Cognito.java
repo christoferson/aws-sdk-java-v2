@@ -199,22 +199,30 @@ public class AwsSdk2Cognito {
 		}
 	}
 
-	public void userPoolResendMail(String userPoolId, String name) {
+	public boolean userPoolResendMail(String userPoolId, String name, String password) {
 
+		boolean success = false;
+		
 		try {
 
+			//AttributeType userAttrs = AttributeType.builder().name("email").value(email).build();
+			//AttributeType userAttrs2 = AttributeType.builder().name("email_verified").value("true").build();
+			
 			AdminCreateUserRequest userRequest = AdminCreateUserRequest.builder().userPoolId(userPoolId)
 					.username(name)
+					.temporaryPassword(password)
 					.messageAction(MessageActionType.RESEND)
 					.desiredDeliveryMediums(DeliveryMediumType.EMAIL)
 					.build();
 
 			AdminCreateUserResponse response = client.adminCreateUser(userRequest);
 			System.out.println(String.format("[ResendMail] User=%s Status=%s", response.user().username(), response.user().userStatus()));
-			
+			success = true;
 		} catch (CognitoIdentityProviderException e) {
 			System.err.println(e.awsErrorDetails().errorMessage());
 		}
+		
+		return success;
 
 	}
 	
