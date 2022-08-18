@@ -1,7 +1,5 @@
 package demo.aws.modules;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -18,8 +16,11 @@ import software.amazon.awssdk.services.batch.model.JobDefinition;
 import software.amazon.awssdk.services.batch.model.JobQueueDetail;
 import software.amazon.awssdk.services.batch.model.JobStatus;
 import software.amazon.awssdk.services.batch.model.JobSummary;
+import software.amazon.awssdk.services.batch.model.JobTimeout;
 import software.amazon.awssdk.services.batch.model.ListJobsRequest;
 import software.amazon.awssdk.services.batch.model.ListJobsResponse;
+import software.amazon.awssdk.services.batch.model.SubmitJobRequest;
+import software.amazon.awssdk.services.batch.model.SubmitJobResponse;
 
 
 public class AwsSdk2Batch {
@@ -96,6 +97,23 @@ public class AwsSdk2Batch {
             System.out.println(String.format("Arn=%s Name=%s", 
             		element.jobDefinitionArn(), element.jobDefinitionName()));
         }
+        
+	}
+	
+	public void jobSubmit(String jobDefinition, String jobQueue, String jobName) {
+
+    	System.out.printf("Sumit Job Def=%s Queue=%s Name=%s... %n", jobDefinition, jobQueue, jobName);
+    	
+    	SubmitJobRequest request = SubmitJobRequest.builder()
+    			.jobDefinition(jobDefinition)
+    			.jobQueue(jobQueue)
+    			.jobName(jobName)
+                .build();
+
+    	SubmitJobResponse response = client.submitJob(request);
+    	SubmitJobResponse element = response;
+        System.out.println(String.format("Arn=%s Name=%s ID=%s", 
+        		element.jobArn(), element.jobName(), element.jobId()));
         
 	}
 	
