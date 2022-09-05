@@ -11,6 +11,11 @@ import software.amazon.awssdk.services.cloudfront.model.ListCloudFrontOriginAcce
 import software.amazon.awssdk.services.cloudfront.model.ListCloudFrontOriginAccessIdentitiesResponse;
 import software.amazon.awssdk.services.cloudfront.model.ListDistributionsRequest;
 import software.amazon.awssdk.services.cloudfront.model.ListDistributionsResponse;
+import software.amazon.awssdk.services.cloudfront.model.ListOriginRequestPoliciesRequest;
+import software.amazon.awssdk.services.cloudfront.model.ListOriginRequestPoliciesResponse;
+import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicy;
+import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicyConfig;
+import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicySummary;
 
 public class AwsSdk2Cloudfront {
 
@@ -52,6 +57,23 @@ public class AwsSdk2Cloudfront {
 			System.out.println(String.format("ID=%s Comment=%s CanonicalUserId=%s", 
 					element.id(), element.comment(), element.s3CanonicalUserId()));
 		}
+
 	}
-	
+
+	public void originRequestPolicyList() {
+
+		System.out.println(String.format("List OriginRequestPoliciesRequest"));
+		
+		ListOriginRequestPoliciesRequest request = ListOriginRequestPoliciesRequest.builder()
+				.build();
+
+		ListOriginRequestPoliciesResponse result = client.listOriginRequestPolicies(request);
+		List<OriginRequestPolicySummary> elements = result.originRequestPolicyList().items();
+		for (OriginRequestPolicySummary element : elements) {
+			OriginRequestPolicy originPolicy = element.originRequestPolicy();
+			OriginRequestPolicyConfig originPolicyConfig = originPolicy.originRequestPolicyConfig();
+			System.out.println(String.format("ID=%s Name=%s Comment=%s Config=%s", 
+					originPolicy.id(), originPolicyConfig.name(), originPolicyConfig.comment(), originPolicyConfig));
+		}
+	}
 }
