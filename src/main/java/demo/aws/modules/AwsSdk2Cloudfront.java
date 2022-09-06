@@ -6,7 +6,11 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
 import software.amazon.awssdk.services.cloudfront.model.CloudFrontOriginAccessIdentitySummary;
+import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationRequest;
+import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationResponse;
 import software.amazon.awssdk.services.cloudfront.model.DistributionSummary;
+import software.amazon.awssdk.services.cloudfront.model.Invalidation;
+import software.amazon.awssdk.services.cloudfront.model.InvalidationBatch;
 import software.amazon.awssdk.services.cloudfront.model.ListCloudFrontOriginAccessIdentitiesRequest;
 import software.amazon.awssdk.services.cloudfront.model.ListCloudFrontOriginAccessIdentitiesResponse;
 import software.amazon.awssdk.services.cloudfront.model.ListDistributionsRequest;
@@ -16,6 +20,7 @@ import software.amazon.awssdk.services.cloudfront.model.ListOriginRequestPolicie
 import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicy;
 import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicyConfig;
 import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicySummary;
+import software.amazon.awssdk.services.cloudfront.model.Paths;
 
 public class AwsSdk2Cloudfront {
 
@@ -76,4 +81,25 @@ public class AwsSdk2Cloudfront {
 					originPolicy.id(), originPolicyConfig.name(), originPolicyConfig.comment(), originPolicyConfig));
 		}
 	}
+	
+	public void createInvalidation(String callerReference, String distributionId, String ... paths) {
+
+		System.out.println(String.format("Create Invalidation"));
+		
+		CreateInvalidationRequest request = CreateInvalidationRequest.builder()
+				.distributionId(distributionId)
+				.invalidationBatch(InvalidationBatch.builder()
+						.paths(Paths.builder()
+								.items(paths)
+								.quantity(paths.length)
+								.build())
+						.callerReference(callerReference)
+						.build())
+				.build();
+
+		CreateInvalidationResponse result = client.createInvalidation(request);
+		Invalidation element = result.invalidation();
+		System.out.println(String.format("Invalidation=%s", element));
+	}
+	
 }
