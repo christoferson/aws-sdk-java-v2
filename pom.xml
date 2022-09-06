@@ -131,7 +131,12 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sfn</artifactId>
         </dependency>
-                   
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>cloudwatch</artifactId>
+        </dependency>
+                           
         <!--  Others -->
 
 		<!-- https://mvnrepository.com/artifact/software.amazon.dax/amazon-dax-client -->
