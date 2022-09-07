@@ -1,8 +1,8 @@
 package demo.aws.modules;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -10,11 +10,19 @@ import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
 import software.amazon.awssdk.services.cloudwatch.model.DashboardEntry;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 import software.amazon.awssdk.services.cloudwatch.model.DimensionFilter;
+import software.amazon.awssdk.services.cloudwatch.model.GetMetricDataRequest;
+import software.amazon.awssdk.services.cloudwatch.model.GetMetricDataResponse;
+import software.amazon.awssdk.services.cloudwatch.model.GetMetricStatisticsRequest;
+import software.amazon.awssdk.services.cloudwatch.model.GetMetricStatisticsResponse;
 import software.amazon.awssdk.services.cloudwatch.model.ListDashboardsRequest;
 import software.amazon.awssdk.services.cloudwatch.model.ListDashboardsResponse;
 import software.amazon.awssdk.services.cloudwatch.model.ListMetricsRequest;
 import software.amazon.awssdk.services.cloudwatch.model.ListMetricsResponse;
+import software.amazon.awssdk.services.cloudwatch.model.MessageData;
 import software.amazon.awssdk.services.cloudwatch.model.Metric;
+import software.amazon.awssdk.services.cloudwatch.model.MetricDataQuery;
+import software.amazon.awssdk.services.cloudwatch.model.MetricDataResult;
+import software.amazon.awssdk.services.cloudwatch.model.Statistic;
 
 public class AwsSdk2Cloudwatch {
 
@@ -28,14 +36,14 @@ public class AwsSdk2Cloudwatch {
 				  .build();
 	}
 	
-	public void metricsList(String namespace, String metricName) {
+	public void metricsList(String namespace, String metricName, DimensionFilter ... dimensions) {
 		
 		System.out.println(String.format("List CloudWatch Metrics"));
 
     	ListMetricsRequest request = ListMetricsRequest.builder()
     			.namespace(namespace)
     			.metricName(metricName)
-    			//AWS/S3 NumberOfObjects .dimensions(DimensionFilter.builder().name("BucketName").value("demo-cloudformation").build())
+    			.dimensions(dimensions)
     			.build();
     	ListMetricsResponse result = client.listMetrics(request);
         List<Metric> list = result.metrics();
@@ -48,6 +56,53 @@ public class AwsSdk2Cloudwatch {
         }
         
 	}
+	
+	public void metricDataGet(String namespace, String metricName) {
+		
+		System.out.println(String.format("List CloudWatch Metrics"));
+
+		GetMetricDataRequest request = GetMetricDataRequest.builder()
+				.startTime(Instant.now())
+				.endTime(Instant.now().plus(3, ChronoUnit.DAYS))
+				.metricDataQueries(MetricDataQuery.builder().build()) //TODO:
+    			.build();
+		GetMetricDataResponse result = client.getMetricData(request);
+        List<MetricDataResult> list = result.metricDataResults();
+
+        for (MetricDataResult element : list) {
+            System.out.println(String.format("%s %s", element.id(), element.label()));
+            for (MessageData message : element.messages()) {
+            	System.out.println(String.format("  %s %s", message.code(), message.value()));
+            }
+        }
+        
+	}
+	/*
+	public void metricStatisticGet(String namespace, String metricName, Dimension ... dimensions) {
+		
+		System.out.println(String.format("List CloudWatch Metrics"));
+
+		GetMetricStatisticsRequest request = GetMetricStatisticsRequest.builder()
+				.startTime(Instant.now())
+				.endTime(Instant.now().plus(3, ChronoUnit.DAYS))
+				.namespace(namespace)
+				.metricName(metricName)
+				.statistics(Statistic.SUM)
+				.period(3600)
+				.dimensions(dimensions)
+    			.build();
+		GetMetricStatisticsResponse result = client.getMetricStatistics(request);
+        List<MetricDataResult> list = result.metricDataResults();
+
+        for (MetricDataResult element : list) {
+            System.out.println(String.format("%s %s", element.id(), element.label()));
+            for (MessageData message : element.messages()) {
+            	System.out.println(String.format("  %s %s", message.code(), message.value()));
+            }
+        }
+        
+	}
+	*/
 
 	public void dashboardList() {
 		
