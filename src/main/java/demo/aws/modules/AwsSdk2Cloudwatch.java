@@ -7,26 +7,14 @@ import java.util.TreeMap;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
+import software.amazon.awssdk.services.cloudwatch.model.DashboardEntry;
+import software.amazon.awssdk.services.cloudwatch.model.Dimension;
+import software.amazon.awssdk.services.cloudwatch.model.DimensionFilter;
+import software.amazon.awssdk.services.cloudwatch.model.ListDashboardsRequest;
+import software.amazon.awssdk.services.cloudwatch.model.ListDashboardsResponse;
 import software.amazon.awssdk.services.cloudwatch.model.ListMetricsRequest;
 import software.amazon.awssdk.services.cloudwatch.model.ListMetricsResponse;
 import software.amazon.awssdk.services.cloudwatch.model.Metric;
-import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminAddUserToGroupRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserResponse;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminDeleteUserRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserResponse;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.DeliveryMediumType;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUserPoolsRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUserPoolsResponse;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersResponse;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.MessageActionType;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.UserPoolDescriptionType;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.UserType;
 
 public class AwsSdk2Cloudwatch {
 
@@ -40,17 +28,39 @@ public class AwsSdk2Cloudwatch {
 				  .build();
 	}
 	
-	public void metricsList() {
+	public void metricsList(String namespace, String metricName) {
+		
+		System.out.println(String.format("List CloudWatch Metrics"));
 
     	ListMetricsRequest request = ListMetricsRequest.builder()
-    			.namespace("S3")
-    			//.metricName("ConcurrentExecutions")
+    			.namespace(namespace)
+    			.metricName(metricName)
+    			//AWS/S3 NumberOfObjects .dimensions(DimensionFilter.builder().name("BucketName").value("demo-cloudformation").build())
     			.build();
     	ListMetricsResponse result = client.listMetrics(request);
         List<Metric> list = result.metrics();
 
         for (Metric element : list) {
             System.out.println(String.format("%s %s", element.namespace(), element.metricName()));
+            for (Dimension dimension : element.dimensions()) {
+            	System.out.println(String.format("  %s %s", dimension.name(), dimension.value()));
+            }
+        }
+        
+	}
+
+	public void dashboardList() {
+		
+		System.out.println(String.format("List CloudWatch Dashboard"));
+
+		ListDashboardsRequest request = ListDashboardsRequest.builder()
+    			//.metricName("ConcurrentExecutions")
+    			.build();
+		ListDashboardsResponse result = client.listDashboards(request);
+        List<DashboardEntry> list = result.dashboardEntries();
+
+        for (DashboardEntry element : list) {
+            System.out.println(String.format("%s %s", element.dashboardName(), element.dashboardArn()));
         }
         
 	}
