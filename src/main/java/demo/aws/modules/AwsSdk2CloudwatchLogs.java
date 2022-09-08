@@ -31,7 +31,13 @@ import software.amazon.awssdk.services.cloudwatch.model.Statistic;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogGroupsRequest;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogGroupsResponse;
+import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRequest;
+import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsResponse;
+import software.amazon.awssdk.services.cloudwatchlogs.model.GetLogEventsRequest;
+import software.amazon.awssdk.services.cloudwatchlogs.model.GetLogEventsResponse;
 import software.amazon.awssdk.services.cloudwatchlogs.model.LogGroup;
+import software.amazon.awssdk.services.cloudwatchlogs.model.LogStream;
+import software.amazon.awssdk.services.cloudwatchlogs.model.OutputLogEvent;
 
 public class AwsSdk2CloudwatchLogs {
 
@@ -61,5 +67,24 @@ public class AwsSdk2CloudwatchLogs {
         }
         
 	}
-	
+
+	public void logStreamList(String logGroupName, String prefix) {
+		
+		System.out.println(String.format("List CloudWatch LogStream"));
+
+		DescribeLogStreamsRequest request = DescribeLogStreamsRequest.builder()
+				.logGroupName(logGroupName)
+				.logStreamNamePrefix(prefix)
+    			.build();
+		
+		DescribeLogStreamsResponse result = client.describeLogStreams(request);
+        List<LogStream> list = result.logStreams();
+
+        for (LogStream element : list) {
+            System.out.println(String.format("%s %s %s", element.logStreamName(), element.firstEventTimestamp(), element.lastEventTimestamp()));
+        }
+        
+	}
+
+
 }
