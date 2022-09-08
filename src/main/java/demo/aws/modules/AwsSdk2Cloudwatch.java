@@ -3,6 +3,7 @@ package demo.aws.modules;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -22,6 +23,10 @@ import software.amazon.awssdk.services.cloudwatch.model.MessageData;
 import software.amazon.awssdk.services.cloudwatch.model.Metric;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDataQuery;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDataResult;
+import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
+import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
+import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataResponse;
+import software.amazon.awssdk.services.cloudwatch.model.StandardUnit;
 import software.amazon.awssdk.services.cloudwatch.model.Statistic;
 
 public class AwsSdk2Cloudwatch {
@@ -103,14 +108,33 @@ public class AwsSdk2Cloudwatch {
         
 	}
 	*/
+	
+	public void metricPut(String namespace, String metricName, Dimension ... dimensions) {
+		
+		System.out.println(String.format("Put CloudWatch Metric"));
+
+		PutMetricDataRequest request = PutMetricDataRequest.builder()
+				.namespace(namespace)
+    			.metricData(MetricDatum.builder()
+    					.metricName(metricName)
+    					.unit(StandardUnit.COUNT)
+    					.value(ThreadLocalRandom.current().nextDouble(1, 8))
+    					.dimensions(dimensions)
+    					.timestamp(Instant.now().truncatedTo(ChronoUnit.MILLIS))
+    					.build())
+    			.build();
+		PutMetricDataResponse result = client.putMetricData(request);
+		System.out.println(result);
+        
+	}
 
 	public void dashboardList() {
 		
 		System.out.println(String.format("List CloudWatch Dashboard"));
 
 		ListDashboardsRequest request = ListDashboardsRequest.builder()
-    			//.metricName("ConcurrentExecutions")
     			.build();
+		
 		ListDashboardsResponse result = client.listDashboards(request);
         List<DashboardEntry> list = result.dashboardEntries();
 
