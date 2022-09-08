@@ -2,6 +2,7 @@ package demo.aws.modules;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -26,19 +27,35 @@ import software.amazon.awssdk.services.cloudwatch.model.MetricDataResult;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataResponse;
-import software.amazon.awssdk.services.cloudwatch.model.StandardUnit;
 import software.amazon.awssdk.services.cloudwatch.model.Statistic;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogGroupsRequest;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogGroupsResponse;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRequest;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsResponse;
+import software.amazon.awssdk.services.cloudwatchlogs.model.FilterLogEventsRequest;
+import software.amazon.awssdk.services.cloudwatchlogs.model.FilterLogEventsResponse;
+import software.amazon.awssdk.services.cloudwatchlogs.model.FilteredLogEvent;
 import software.amazon.awssdk.services.cloudwatchlogs.model.GetLogEventsRequest;
 import software.amazon.awssdk.services.cloudwatchlogs.model.GetLogEventsResponse;
 import software.amazon.awssdk.services.cloudwatchlogs.model.LogGroup;
 import software.amazon.awssdk.services.cloudwatchlogs.model.LogStream;
+import software.amazon.awssdk.services.cloudwatchlogs.model.MetricTransformation;
 import software.amazon.awssdk.services.cloudwatchlogs.model.OutputLogEvent;
+import software.amazon.awssdk.services.cloudwatchlogs.model.PutMetricFilterRequest;
+import software.amazon.awssdk.services.cloudwatchlogs.model.PutMetricFilterResponse;
+import software.amazon.awssdk.services.cloudwatchlogs.model.StandardUnit;
 
+//TODO:
+// List & Create Log Groups
+// Log Streams
+// Metric Filters - Create Alaram
+// Subscription Filters - Lambda
+// Contributor Insights
+// Insights
+//fields @timestamp, @message
+//| sort @timestamp desc
+//| limit 20
 public class AwsSdk2CloudwatchLogs {
 
 	private CloudWatchLogsClient  client;
@@ -86,5 +103,24 @@ public class AwsSdk2CloudwatchLogs {
         
 	}
 
+	public void logEventList(String logGroupName, String logStreamName) {
+		
+		System.out.println(String.format("List CloudWatch LogEvent"));
 
+		GetLogEventsRequest request = GetLogEventsRequest.builder()
+				.logGroupName(logGroupName)
+				.logStreamName(logStreamName)
+				//.startTime(null)
+				//.endTime(null)
+    			.build();
+		
+		GetLogEventsResponse result = client.getLogEvents(request);
+        List<OutputLogEvent> list = result.events();
+
+        for (OutputLogEvent element : list) {
+            System.out.println(String.format("%s %s", element.timestamp(), element.message()));
+        }
+        
+	}
+	
 }
