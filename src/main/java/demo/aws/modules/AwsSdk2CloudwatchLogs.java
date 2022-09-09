@@ -103,15 +103,15 @@ public class AwsSdk2CloudwatchLogs {
         
 	}
 
-	public void logEventList(String logGroupName, String logStreamName) {
+	public void logEventList(String logGroupName, String logStreamName, Long startTime, Long endTime) {
 		
 		System.out.println(String.format("List CloudWatch LogEvent"));
 
 		GetLogEventsRequest request = GetLogEventsRequest.builder()
 				.logGroupName(logGroupName)
 				.logStreamName(logStreamName)
-				//.startTime(null)
-				//.endTime(null)
+				.startTime(startTime)
+				.endTime(endTime)
     			.build();
 		
 		GetLogEventsResponse result = client.getLogEvents(request);
@@ -123,4 +123,50 @@ public class AwsSdk2CloudwatchLogs {
         
 	}
 	
+	public void logEventFilter(String logGroupName, String logStreamName) {
+		
+		System.out.println(String.format("Filter CloudWatch LogEvent"));
+
+		FilterLogEventsRequest request = FilterLogEventsRequest.builder()
+				.logGroupName(logGroupName)
+				.logStreamNames(logStreamName)
+				.filterPattern("ERROR")
+    			.build();
+		
+		FilterLogEventsResponse result = client.filterLogEvents(request);
+        List<FilteredLogEvent> list = result.events();
+
+        for (FilteredLogEvent element : list) {
+            System.out.println(String.format("%s %s", element.timestamp(), element.message()));
+        }
+        
+	}
+	
+	//
+
+	// Valid metric values are: floating point number (1, 99.9, etc.), numeric field identifiers ($1, $2, etc.), 
+	// or named field identifiers (e.g. $requestSize for delimited filter pattern or 
+	// $.status for JSON-based filter pattern - dollar ($) or dollar dot ($.) followed by alphanumeric and/or underscore (_) characters)
+	public void metricFilterRegister(String logGroupName, String filterName, String filterPattern) {
+		
+		System.out.println(String.format("Register CloudWatch MetricFilter"));
+
+		PutMetricFilterRequest request = PutMetricFilterRequest.builder()
+				.filterName(filterName)
+				.filterPattern(filterPattern)
+				.logGroupName(logGroupName)
+				.metricTransformations(MetricTransformation.builder()
+						.metricNamespace("MyNamespace")
+						.metricName("FooErrorCount")
+						.unit(StandardUnit.COUNT) //Optional
+						.metricValue("1") 
+						.defaultValue(0.0)
+						//.dimensions(new HashMap<String, String>() {{ put("X", "037434729"); put("Y", "81739838"); }})
+						.build())
+    			.build();
+		
+		PutMetricFilterResponse result = client.putMetricFilter(request);
+        System.out.println(result);
+        
+	}
 }
