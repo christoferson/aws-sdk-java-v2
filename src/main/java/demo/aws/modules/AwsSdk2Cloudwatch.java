@@ -3,7 +3,9 @@ package demo.aws.modules;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -109,16 +111,16 @@ public class AwsSdk2Cloudwatch {
 	}
 	*/
 	
-	public void metricPut(String namespace, String metricName, Dimension ... dimensions) {
+	public void metricPut(String namespace, String metricName, Double metricValue, Dimension ... dimensions) {
 		
-		System.out.println(String.format("Put CloudWatch Metric"));
+		System.out.println(String.format("Put CloudWatch Metric. Namespace=%s Name=%s", namespace, metricName));
 
 		PutMetricDataRequest request = PutMetricDataRequest.builder()
 				.namespace(namespace)
     			.metricData(MetricDatum.builder()
     					.metricName(metricName)
     					.unit(StandardUnit.COUNT)
-    					.value(ThreadLocalRandom.current().nextDouble(1, 8))
+    					.value(metricValue)
     					.dimensions(dimensions)
     					.timestamp(Instant.now().truncatedTo(ChronoUnit.MILLIS))
     					.build())
@@ -128,6 +130,30 @@ public class AwsSdk2Cloudwatch {
         
 	}
 
+	public void metricPut(String namespace, String metricName, Double metricValue, Map<String, String> dimensionMap) {
+		
+		System.out.println(String.format("Put CloudWatch Metric. Namespace=%s Name=%s Dimension=%s", namespace, metricName, dimensionMap));
+
+		List<Dimension> dimensions = dimensionMap.entrySet().stream()
+			.map((entry) -> {
+				return Dimension.builder().name(entry.getKey()).value(entry.getValue()).build();
+			})
+			.collect(Collectors.toList());
+		
+		PutMetricDataRequest request = PutMetricDataRequest.builder()
+				.namespace(namespace)
+    			.metricData(MetricDatum.builder()
+    					.metricName(metricName)
+    					.unit(StandardUnit.COUNT)
+    					.value(metricValue)
+    					.dimensions(dimensions)
+    					.timestamp(Instant.now().truncatedTo(ChronoUnit.MILLIS))
+    					.build())
+    			.build();
+		PutMetricDataResponse result = client.putMetricData(request);
+		System.out.println(result);
+        
+	}
 	public void dashboardList() {
 		
 		System.out.println(String.format("List CloudWatch Dashboard"));
