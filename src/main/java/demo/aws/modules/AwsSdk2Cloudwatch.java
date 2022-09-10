@@ -11,6 +11,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
 import software.amazon.awssdk.services.cloudwatch.model.DashboardEntry;
+import software.amazon.awssdk.services.cloudwatch.model.Datapoint;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 import software.amazon.awssdk.services.cloudwatch.model.DimensionFilter;
 import software.amazon.awssdk.services.cloudwatch.model.GetMetricDataRequest;
@@ -84,14 +85,14 @@ public class AwsSdk2Cloudwatch {
         }
         
 	}
-	/*
+	
 	public void metricStatisticGet(String namespace, String metricName, Dimension ... dimensions) {
 		
-		System.out.println(String.format("List CloudWatch Metrics"));
+		System.out.println(String.format("List CloudWatch MetricStatistic"));
 
 		GetMetricStatisticsRequest request = GetMetricStatisticsRequest.builder()
-				.startTime(Instant.now())
-				.endTime(Instant.now().plus(3, ChronoUnit.DAYS))
+				.startTime(Instant.now().minus(5, ChronoUnit.HOURS).truncatedTo(ChronoUnit.MILLIS))
+				.endTime(Instant.now().plus(3, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MILLIS))
 				.namespace(namespace)
 				.metricName(metricName)
 				.statistics(Statistic.SUM)
@@ -99,45 +100,21 @@ public class AwsSdk2Cloudwatch {
 				.dimensions(dimensions)
     			.build();
 		GetMetricStatisticsResponse result = client.getMetricStatistics(request);
-        List<MetricDataResult> list = result.metricDataResults();
+        List<Datapoint> list = result.datapoints();
 
-        for (MetricDataResult element : list) {
-            System.out.println(String.format("%s %s", element.id(), element.label()));
-            for (MessageData message : element.messages()) {
-            	System.out.println(String.format("  %s %s", message.code(), message.value()));
-            }
+        for (Datapoint element : list) {
+            System.out.println(String.format("%s %s %s", element.timestamp(), element.unit(), element.sum()));
         }
         
 	}
-	*/
 	
-	public void metricPut(String namespace, String metricName, Double metricValue, Dimension ... dimensions) {
-		
-		System.out.println(String.format("Put CloudWatch Metric. Namespace=%s Name=%s", namespace, metricName));
-
-		PutMetricDataRequest request = PutMetricDataRequest.builder()
-				.namespace(namespace)
-    			.metricData(MetricDatum.builder()
-    					.metricName(metricName)
-    					.unit(StandardUnit.COUNT)
-    					.value(metricValue)
-    					.dimensions(dimensions)
-    					.timestamp(Instant.now().truncatedTo(ChronoUnit.MILLIS))
-    					.build())
-    			.build();
-		PutMetricDataResponse result = client.putMetricData(request);
-		System.out.println(result);
-        
-	}
-
+	
 	public void metricPut(String namespace, String metricName, Double metricValue, Map<String, String> dimensionMap) {
 		
 		System.out.println(String.format("Put CloudWatch Metric. Namespace=%s Name=%s Dimension=%s", namespace, metricName, dimensionMap));
 
 		List<Dimension> dimensions = dimensionMap.entrySet().stream()
-			.map((entry) -> {
-				return Dimension.builder().name(entry.getKey()).value(entry.getValue()).build();
-			})
+			.map(entry -> Dimension.builder().name(entry.getKey()).value(entry.getValue()).build())
 			.collect(Collectors.toList());
 		
 		PutMetricDataRequest request = PutMetricDataRequest.builder()
@@ -150,10 +127,12 @@ public class AwsSdk2Cloudwatch {
     					.timestamp(Instant.now().truncatedTo(ChronoUnit.MILLIS))
     					.build())
     			.build();
+
 		PutMetricDataResponse result = client.putMetricData(request);
 		System.out.println(result);
         
 	}
+	
 	public void dashboardList() {
 		
 		System.out.println(String.format("List CloudWatch Dashboard"));
