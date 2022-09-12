@@ -18,6 +18,8 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdate
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdateUserAttributesResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CreateGroupRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CreateGroupResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.DeliveryMediumType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.GroupType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ListGroupsRequest;
@@ -59,6 +61,21 @@ public class AwsSdk2Cognito {
         
 	}
 
+	public void userPoolRegisterGroup(String poolId, String groupName, String description) {
+		
+		System.out.printf("Register Cognito Group. Pool=%s Group=%s %n", poolId, groupName);
+
+		CreateGroupRequest request = CreateGroupRequest.builder()
+    			.userPoolId(poolId)
+    			.groupName(groupName)
+    			.description(description)
+    			.build();
+    	
+		CreateGroupResponse result = client.createGroup(request);
+    	
+		System.out.println(String.format("%s", result));
+        
+	}
 
 	public Map<String, String> userPoolListGroups(String poolId, Integer limit) {
 		
@@ -234,21 +251,18 @@ public class AwsSdk2Cognito {
 
 	}
 	
-	public  void userPoolAddUserToGroup(String userPoolId, String name, String groupName) {
+	public  void userPoolAddUserToGroup(String userPoolId, String userName, String groupName) {
+		
+		System.out.println(String.format("Add Cognito User to Group. User=%s Group=%s", userName, groupName));
 	
-		try {
+		AdminAddUserToGroupRequest userRequest = AdminAddUserToGroupRequest.builder().userPoolId(userPoolId)
+				.username(userName)
+				.groupName(groupName)
+				.build();
 
-			AdminAddUserToGroupRequest userRequest = AdminAddUserToGroupRequest.builder().userPoolId(userPoolId)
-					.username(name)
-					.groupName(groupName)
-					.build();
+		client.adminAddUserToGroup(userRequest);
+		System.out.println(String.format("[AddUserToGroup] User=%s added to Group=%s", userName, groupName));
 
-			client.adminAddUserToGroup(userRequest);
-			System.out.println(String.format("[AddUserToGroup] User=%s added to Group=%s", name, groupName));
-
-		} catch (CognitoIdentityProviderException e) {
-			System.err.println(e.awsErrorDetails().errorMessage());
-		}
 	}
 
 	public boolean userPoolResendMail(String userPoolId, String name, String password) {
