@@ -118,24 +118,24 @@ public class AwsSdk2Cognito {
         
 	}
 	
-	public String userPoolGetUser(String userPoolId, String name) {
+	public String userPoolGetUser(String userPoolId, String name) throws CognitoIdentityProviderException {
 
-		try {
+		System.out.println(String.format("Get Cognito User. User=%s", name));
+		
+		AdminGetUserRequest userRequest = AdminGetUserRequest.builder()
+				.userPoolId(userPoolId)
+				.username(name)
+				.build();
 
-			AdminGetUserRequest userRequest = AdminGetUserRequest.builder().userPoolId(userPoolId).username(name)
-					.build();
-
-			AdminGetUserResponse response = client.adminGetUser(userRequest);
-			System.out.println(String.format("[GetUser] User=%s Status=%s", response.username(), response.userStatus()));
-
-			return response.username();
-			
-		} catch (CognitoIdentityProviderException e) {
-			System.err.println(e.awsErrorDetails().errorMessage());
+		AdminGetUserResponse response = client.adminGetUser(userRequest);
+		
+		System.out.println(String.format("[GetUser] User=%s Status=%s", response.username(), response.userStatus()));
+		List<AttributeType> attributeList = response.userAttributes();
+		for (AttributeType attribute : attributeList) {
+			System.out.println(String.format("  %s=%s", attribute.name(), attribute.value()));
 		}
 		
-		return null;
-		
+		return response.username();
 
 	}
 	
