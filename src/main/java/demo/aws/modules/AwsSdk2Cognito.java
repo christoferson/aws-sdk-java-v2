@@ -7,15 +7,21 @@ import java.util.TreeMap;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AddCustomAttributesRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminAddUserToGroupRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminDeleteUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdateUserAttributesRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdateUserAttributesResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.DeliveryMediumType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.GroupType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ListGroupsRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ListGroupsResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUserPoolsRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUserPoolsResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersRequest;
@@ -24,6 +30,8 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.MessageActi
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserPoolDescriptionType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserType;
 
+// Custom Attributes cannot be deleted or modified after adding to User Pool.
+// You can delete Custom Attribute association from User
 public class AwsSdk2Cognito {
 
 	private CognitoIdentityProviderClient  client;
@@ -38,24 +46,45 @@ public class AwsSdk2Cognito {
 	
 	public void userPoolList() {
 
-        try {
-        	
-        	ListUserPoolsRequest request = ListUserPoolsRequest.builder()
-        			.maxResults(3)
-        			.build();
-        	ListUserPoolsResponse result = client.listUserPools(request);
-            List<UserPoolDescriptionType> list = result.userPools();
+     	ListUserPoolsRequest request = ListUserPoolsRequest.builder()
+    			.maxResults(3)
+    			.build();
+     	
+    	ListUserPoolsResponse result = client.listUserPools(request);
+        List<UserPoolDescriptionType> list = result.userPools();
 
-            for (UserPoolDescriptionType element : list) {
-                System.out.println(String.format("%s %s", element.id(), element.name()));
-            }
-
-        } catch(CognitoIdentityProviderException e) {
-            System.err.println(e.getMessage());
+        for (UserPoolDescriptionType element : list) {
+            System.out.println(String.format("%s %s", element.id(), element.name()));
         }
         
 	}
 
+
+	public Map<String, String> userPoolListGroups(String poolId, Integer limit) {
+		
+		System.out.printf("Listing Cognito Groups. Pool=%s %n", poolId);
+
+		Map<String, String> users = new TreeMap<>();
+		
+    	ListGroupsRequest request = ListGroupsRequest.builder()
+    			.userPoolId(poolId)
+    			.limit(limit)
+    			.build();
+    	
+    	ListGroupsResponse result = client.listGroups(request);
+    	
+        List<GroupType> list = result.groups();
+
+        for (GroupType element : list) {
+        	
+            System.out.println(String.format("%s %s", element.groupName(), element.description()));
+            users.put(element.groupName(), element.description());
+        }
+
+        return users;
+        
+	}
+	
 	public Map<String, String> userPoolListUsers(String poolId, Integer limit) {
 
 		Map<String, String> users = new TreeMap<>();
@@ -138,6 +167,29 @@ public class AwsSdk2Cognito {
 		return response.username();
 
 	}
+	/*
+	//addCustomAttributes
+	public String userPoolEditUserAttribute(String userPoolId, String name) throws CognitoIdentityProviderException {
+
+		System.out.println(String.format("Get Cognito User. User=%s", name));
+		
+		AddCustomAttributesRequest userRequest = AddCustomAttributesRequest.builder()
+				.userPoolId(userPoolId)
+				.username(name)
+				.build();
+
+		AdminGetUserResponse response = client.
+		
+		System.out.println(String.format("[GetUser] User=%s Status=%s", response.username(), response.userStatus()));
+		List<AttributeType> attributeList = response.userAttributes();
+		for (AttributeType attribute : attributeList) {
+			System.out.println(String.format("  %s=%s", attribute.name(), attribute.value()));
+		}
+		
+		return response.username();
+
+	}
+	*/
 	
 	public void userPoolDeleteUser(String userPoolId, String name) {
 
