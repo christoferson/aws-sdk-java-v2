@@ -86,10 +86,14 @@ public class AwsSdk2Cloudwatch {
         
 	}
 	
-	public void metricStatisticGet(String namespace, String metricName, Dimension ... dimensions) {
+	public void metricStatisticGet(String namespace, String metricName, Map<String, String> dimensionMap) {
 		
-		System.out.println(String.format("List CloudWatch MetricStatistic"));
+		System.out.println(String.format("List CloudWatch MetricStatistic. Namespace=%s Name=%s Dimension=%s", namespace, metricName, dimensionMap));
 
+		List<Dimension> dimensions = dimensionMap.entrySet().stream()
+				.map(entry -> Dimension.builder().name(entry.getKey()).value(entry.getValue()).build())
+				.collect(Collectors.toList());
+		
 		GetMetricStatisticsRequest request = GetMetricStatisticsRequest.builder()
 				.startTime(Instant.now().minus(5, ChronoUnit.HOURS).truncatedTo(ChronoUnit.MILLIS))
 				.endTime(Instant.now().plus(3, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MILLIS))
