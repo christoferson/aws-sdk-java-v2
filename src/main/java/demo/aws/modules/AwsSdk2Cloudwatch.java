@@ -10,8 +10,11 @@ import java.util.stream.Collectors;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
+import software.amazon.awssdk.services.cloudwatch.model.CompositeAlarm;
 import software.amazon.awssdk.services.cloudwatch.model.DashboardEntry;
 import software.amazon.awssdk.services.cloudwatch.model.Datapoint;
+import software.amazon.awssdk.services.cloudwatch.model.DescribeAlarmsRequest;
+import software.amazon.awssdk.services.cloudwatch.model.DescribeAlarmsResponse;
 import software.amazon.awssdk.services.cloudwatch.model.Dimension;
 import software.amazon.awssdk.services.cloudwatch.model.DimensionFilter;
 import software.amazon.awssdk.services.cloudwatch.model.GetMetricDataRequest;
@@ -24,6 +27,7 @@ import software.amazon.awssdk.services.cloudwatch.model.ListMetricsRequest;
 import software.amazon.awssdk.services.cloudwatch.model.ListMetricsResponse;
 import software.amazon.awssdk.services.cloudwatch.model.MessageData;
 import software.amazon.awssdk.services.cloudwatch.model.Metric;
+import software.amazon.awssdk.services.cloudwatch.model.MetricAlarm;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDataQuery;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDataResult;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
@@ -151,6 +155,28 @@ public class AwsSdk2Cloudwatch {
             System.out.println(String.format("%s %s", element.dashboardName(), element.dashboardArn()));
         }
         
+	}
+	
+	///
+	
+	public void alarmList() {
+		
+		System.out.println(String.format("List CloudWatch Alarms"));
+
+		DescribeAlarmsRequest request = DescribeAlarmsRequest.builder()
+    			.build();
+		
+		DescribeAlarmsResponse result = client.describeAlarms(request);
+        
+		System.out.println(String.format("Metric Alarms"));
+		List<MetricAlarm> list = result.metricAlarms();
+        for (MetricAlarm element : list) {
+            System.out.println(String.format("%s %s", element.alarmName(), element.alarmDescription()));
+        }
+        System.out.println(String.format("Composite Alarms"));
+        for (CompositeAlarm element : result.compositeAlarms()) {
+            System.out.println(String.format("%s %s", element.alarmName(), element.alarmDescription()));
+        }
 	}
 	
 }
