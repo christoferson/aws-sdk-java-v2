@@ -4,26 +4,12 @@ import java.util.List;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
-import software.amazon.awssdk.services.cloudfront.model.CloudFrontOriginAccessIdentitySummary;
-import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationRequest;
-import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationResponse;
-import software.amazon.awssdk.services.cloudfront.model.DistributionSummary;
-import software.amazon.awssdk.services.cloudfront.model.Invalidation;
-import software.amazon.awssdk.services.cloudfront.model.InvalidationBatch;
-import software.amazon.awssdk.services.cloudfront.model.ListCloudFrontOriginAccessIdentitiesRequest;
-import software.amazon.awssdk.services.cloudfront.model.ListCloudFrontOriginAccessIdentitiesResponse;
-import software.amazon.awssdk.services.cloudfront.model.ListDistributionsRequest;
-import software.amazon.awssdk.services.cloudfront.model.ListDistributionsResponse;
-import software.amazon.awssdk.services.cloudfront.model.ListOriginRequestPoliciesRequest;
-import software.amazon.awssdk.services.cloudfront.model.ListOriginRequestPoliciesResponse;
-import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicy;
-import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicyConfig;
-import software.amazon.awssdk.services.cloudfront.model.OriginRequestPolicySummary;
-import software.amazon.awssdk.services.cloudfront.model.Paths;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.DescribeEventBusRequest;
 import software.amazon.awssdk.services.eventbridge.model.DescribeEventBusResponse;
+import software.amazon.awssdk.services.eventbridge.model.EventBus;
+import software.amazon.awssdk.services.eventbridge.model.ListEventBusesRequest;
+import software.amazon.awssdk.services.eventbridge.model.ListEventBusesResponse;
 
 public class AwsSdk2EventBridge {
 
@@ -37,11 +23,12 @@ public class AwsSdk2EventBridge {
 				  .build();
 	}
 
-	public void describeEventBus() {
+	public void describeEventBus(String name) {
 
-		System.out.println(String.format("Describe EventBus"));
+		System.out.println(String.format("Describe EventBus. Name=%s", name));
 		
 		DescribeEventBusRequest request = DescribeEventBusRequest.builder()
+				.name(name)
 				.build();
 
 		DescribeEventBusResponse result = client.describeEventBus(request);
@@ -49,6 +36,22 @@ public class AwsSdk2EventBridge {
 		System.out.println(String.format("Arn=%s Name=%s Policy=%s", 
 				element.arn(), element.name(), element.policy()));
 		
+	}
+	
+	public void listEventBus() {
+
+		System.out.println(String.format("List EventBus"));
+		
+		ListEventBusesRequest request = ListEventBusesRequest.builder()
+				.build();
+
+		ListEventBusesResponse result = client.listEventBuses(request);
+		List<EventBus> elements = result.eventBuses();
+		
+		for (EventBus element : elements) {
+			System.out.println(String.format("Arn=%s Name=%s Policy=%s", 
+					element.arn(), element.name(), element.policy()));
+		}
 	}
 	
 }
