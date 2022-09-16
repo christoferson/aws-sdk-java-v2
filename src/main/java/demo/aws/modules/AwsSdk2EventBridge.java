@@ -10,6 +10,9 @@ import software.amazon.awssdk.services.eventbridge.model.DescribeEventBusRespons
 import software.amazon.awssdk.services.eventbridge.model.EventBus;
 import software.amazon.awssdk.services.eventbridge.model.ListEventBusesRequest;
 import software.amazon.awssdk.services.eventbridge.model.ListEventBusesResponse;
+import software.amazon.awssdk.services.eventbridge.model.ListRulesRequest;
+import software.amazon.awssdk.services.eventbridge.model.ListRulesResponse;
+import software.amazon.awssdk.services.eventbridge.model.Rule;
 
 public class AwsSdk2EventBridge {
 
@@ -23,21 +26,8 @@ public class AwsSdk2EventBridge {
 				  .build();
 	}
 
-	public void describeEventBus(String name) {
+	// Event Bus
 
-		System.out.println(String.format("Describe EventBus. Name=%s", name));
-		
-		DescribeEventBusRequest request = DescribeEventBusRequest.builder()
-				.name(name)
-				.build();
-
-		DescribeEventBusResponse result = client.describeEventBus(request);
-		DescribeEventBusResponse element = result;
-		System.out.println(String.format("Arn=%s Name=%s Policy=%s", 
-				element.arn(), element.name(), element.policy()));
-		
-	}
-	
 	public void listEventBus() {
 
 		System.out.println(String.format("List EventBus"));
@@ -53,5 +43,55 @@ public class AwsSdk2EventBridge {
 					element.arn(), element.name(), element.policy()));
 		}
 	}
+	
+	public void describeEventBus(String name) {
+
+		System.out.println(String.format("Describe EventBus. Name=%s", name));
+		
+		DescribeEventBusRequest request = DescribeEventBusRequest.builder()
+				.name(name)
+				.build();
+
+		DescribeEventBusResponse result = client.describeEventBus(request);
+		DescribeEventBusResponse element = result;
+		System.out.println(String.format("Arn=%s Name=%s Policy=%s", 
+				element.arn(), element.name(), element.policy()));
+		
+	}
+	
+
+	
+	//
+	
+	// Event Rules
+	
+	public void listEventRules(String namePrefix, String eventBusName) {
+
+		System.out.println(String.format("List EventRule"));
+		
+		ListRulesRequest request = ListRulesRequest.builder()
+				.namePrefix(namePrefix)
+				.eventBusName(eventBusName)
+				.build();
+
+		ListRulesResponse result = client.listRules(request);
+		List<Rule> elements = result.rules();
+		
+		for (Rule element : elements) {
+			System.out.println(String.format("Name=%s Description=%s Pattern=%s Managed=%s", 
+					element.name(), element.description(), element.eventPattern(), element.managedBy()));
+		}
+	}	
+	
+	// Global Endpoints
+	
+	// Archives
+	
+	// Replays
+	
+	// APi Destinations / Connections
+	
+	
+	// Schemas / Custom Schema Registry
 	
 }
