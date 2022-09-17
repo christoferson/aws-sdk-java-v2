@@ -1,5 +1,6 @@
 package demo.aws.modules;
 
+import java.time.Instant;
 import java.util.List;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -12,6 +13,10 @@ import software.amazon.awssdk.services.eventbridge.model.ListEventBusesRequest;
 import software.amazon.awssdk.services.eventbridge.model.ListEventBusesResponse;
 import software.amazon.awssdk.services.eventbridge.model.ListRulesRequest;
 import software.amazon.awssdk.services.eventbridge.model.ListRulesResponse;
+import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
+import software.amazon.awssdk.services.eventbridge.model.PutEventsRequestEntry;
+import software.amazon.awssdk.services.eventbridge.model.PutEventsResponse;
+import software.amazon.awssdk.services.eventbridge.model.PutEventsResultEntry;
 import software.amazon.awssdk.services.eventbridge.model.Rule;
 
 public class AwsSdk2EventBridge {
@@ -93,5 +98,31 @@ public class AwsSdk2EventBridge {
 	
 	
 	// Schemas / Custom Schema Registry
+	
+	public void putEvents(String eventBusName) {
+
+		System.out.println(String.format("Put Events"));
+		
+		PutEventsRequest request = PutEventsRequest.builder()
+				.entries(PutEventsRequestEntry.builder()
+						.eventBusName(eventBusName)
+						.source("my.company.app")
+						.detailType("user.registered")
+						.detail("{\"foo\":\"bar\"}")
+						.resources("userid") //optional
+						.time(Instant.now()) //optional
+						.build())
+				.build();
+
+		PutEventsResponse result = client.putEvents(request);
+		List<PutEventsResultEntry> elements = result.entries();
+		
+		for (PutEventsResultEntry element : elements) {
+			System.out.println(String.format("ID=%s Code=%s Message=%s", 
+					element.eventId(), element.errorCode(), element.errorMessage()));
+		}
+	}
+	
+	
 	
 }
