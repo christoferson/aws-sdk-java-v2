@@ -9,8 +9,11 @@ import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
 import software.amazon.awssdk.services.eventbridge.model.DescribeEventBusRequest;
 import software.amazon.awssdk.services.eventbridge.model.DescribeEventBusResponse;
 import software.amazon.awssdk.services.eventbridge.model.EventBus;
+import software.amazon.awssdk.services.eventbridge.model.EventSource;
 import software.amazon.awssdk.services.eventbridge.model.ListEventBusesRequest;
 import software.amazon.awssdk.services.eventbridge.model.ListEventBusesResponse;
+import software.amazon.awssdk.services.eventbridge.model.ListEventSourcesRequest;
+import software.amazon.awssdk.services.eventbridge.model.ListEventSourcesResponse;
 import software.amazon.awssdk.services.eventbridge.model.ListRulesRequest;
 import software.amazon.awssdk.services.eventbridge.model.ListRulesResponse;
 import software.amazon.awssdk.services.eventbridge.model.PutEventsRequest;
@@ -87,8 +90,31 @@ public class AwsSdk2EventBridge {
 					element.name(), element.description(), element.eventPattern(), element.managedBy()));
 		}
 	}	
+
+	//
+	
+	public void listEventSources() {
+
+		System.out.println(String.format("List EventSources"));
+		
+		ListEventSourcesRequest request = ListEventSourcesRequest.builder()
+				//.namePrefix(namePrefix)
+				.build();
+
+		ListEventSourcesResponse result = client.listEventSources(request);
+		List<EventSource> elements = result.eventSources();
+		
+		for (EventSource element : elements) {
+			System.out.println(String.format("Name=%s State=%s CreatedBy=%s ExpirationTime=%s", 
+					element.name(), element.stateAsString(), element.createdBy(), element.expirationTime()));
+		}
+	}
+
+	
+	//
 	
 	// Global Endpoints
+
 	
 	// Archives
 	
