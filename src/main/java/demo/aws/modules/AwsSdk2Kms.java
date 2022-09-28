@@ -1,8 +1,12 @@
 package demo.aws.modules;
 
+import java.nio.ByteBuffer;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
@@ -207,7 +211,7 @@ public class AwsSdk2Kms {
 
 	}
 	
-	public byte[] generateDataKey(String keyId) throws KmsException {
+	public GenerateDataKeyResponse generateDataKey(String keyId) throws KmsException {
 		
         GenerateDataKeyRequest dataKeyRequest = GenerateDataKeyRequest.builder()
         		.keyId(keyId)
@@ -219,15 +223,60 @@ public class AwsSdk2Kms {
         SdkBytes plaintextKey = dataKeyResult.plaintext();
 
         SdkBytes encryptedKey = dataKeyResult.ciphertextBlob();
-
+        
         System.out.printf(
             "Key(Encrypted): %s%n Key(Plain): %s%n",
             encryptedKey,
             plaintextKey
         );
 
-		return encryptedKey.asByteArray();
+		return dataKeyResult;
 
 	}
+	
+    public String envelopeEncryptData(byte[] plainDataKeyByteArray, String data) {
+    	byte[] encryptedByteArray = null;
+    	String encryptedTextBase64 = null;
+    	try {
+    	    Cipher cipher = Cipher.getInstance("AES");
+    	    cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(plainDataKeyByteArray, "AES"));
+    	    encryptedByteArray = cipher.doFinal(data.getBytes());
+			encryptedTextBase64 = Base64.getEncoder().encodeToString(encryptedByteArray);
+			System.out.printf(
+		            "Data(Encrypted): %s%n",
+		            encryptedTextBase64
+		        );
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		throw new RuntimeException(e);
+    	}
+
+        return encryptedTextBase64;
+
+    }
+    
+    public String envelopeDecryptData(String encryptedDataKeyBase64, String encryptedTextBase64) {
+    	String plainText = null;
+    	byte[] encryptedTextByteArray = Base64.getDecoder().decode(encryptedTextBase64);
+    	byte[] encryptedDataKeyByteArray = Base64.getDecoder().decode(encryptedDataKeyBase64);
+    	try {
+
+    		DecryptRequest decryptRequest = DecryptRequest.builder()
+    			    .ciphertextBlob(SdkBytes.fromByteArray(encryptedDataKeyByteArray))
+    			    .build();
+    		SdkBytes plainTextKey = client.decrypt(decryptRequest).plaintext();
+    		
+    	    Cipher cipher = Cipher.getInstance("AES");
+    	    cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(plainTextKey.asByteArray(), "AES"));
+    	    plainText = new String(cipher.doFinal(encryptedTextByteArray));
+
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		throw new RuntimeException(e);
+    	}
+
+        return plainText;
+
+    }
 
 }
