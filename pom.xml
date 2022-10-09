@@ -148,6 +148,11 @@
 		    <groupId>software.amazon.awssdk</groupId>
 		    <artifactId>eventbridge</artifactId>
 		</dependency>   
+		
+		<dependency>
+		    <groupId>software.amazon.awssdk</groupId>
+		    <artifactId>accessanalyzer</artifactId>
+		</dependency>   		
         <!--  Others -->
 
 		<!-- https://mvnrepository.com/artifact/software.amazon.dax/amazon-dax-client -->
