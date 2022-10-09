@@ -11,37 +11,10 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.accessanalyzer.AccessAnalyzerClient;
 import software.amazon.awssdk.services.accessanalyzer.model.AnalyzerSummary;
+import software.amazon.awssdk.services.accessanalyzer.model.DeleteAnalyzerRequest;
+import software.amazon.awssdk.services.accessanalyzer.model.DeleteAnalyzerResponse;
 import software.amazon.awssdk.services.accessanalyzer.model.ListAnalyzersRequest;
 import software.amazon.awssdk.services.accessanalyzer.model.ListAnalyzersResponse;
-import software.amazon.awssdk.services.cloudwatch.CloudWatchClient;
-import software.amazon.awssdk.services.cloudwatch.model.CompositeAlarm;
-import software.amazon.awssdk.services.cloudwatch.model.DashboardEntry;
-import software.amazon.awssdk.services.cloudwatch.model.Datapoint;
-import software.amazon.awssdk.services.cloudwatch.model.DescribeAlarmsRequest;
-import software.amazon.awssdk.services.cloudwatch.model.DescribeAlarmsResponse;
-import software.amazon.awssdk.services.cloudwatch.model.Dimension;
-import software.amazon.awssdk.services.cloudwatch.model.DimensionFilter;
-import software.amazon.awssdk.services.cloudwatch.model.GetMetricDataRequest;
-import software.amazon.awssdk.services.cloudwatch.model.GetMetricDataResponse;
-import software.amazon.awssdk.services.cloudwatch.model.GetMetricStatisticsRequest;
-import software.amazon.awssdk.services.cloudwatch.model.GetMetricStatisticsResponse;
-import software.amazon.awssdk.services.cloudwatch.model.ListDashboardsRequest;
-import software.amazon.awssdk.services.cloudwatch.model.ListDashboardsResponse;
-import software.amazon.awssdk.services.cloudwatch.model.ListMetricsRequest;
-import software.amazon.awssdk.services.cloudwatch.model.ListMetricsResponse;
-import software.amazon.awssdk.services.cloudwatch.model.MessageData;
-import software.amazon.awssdk.services.cloudwatch.model.Metric;
-import software.amazon.awssdk.services.cloudwatch.model.MetricAlarm;
-import software.amazon.awssdk.services.cloudwatch.model.MetricDataQuery;
-import software.amazon.awssdk.services.cloudwatch.model.MetricDataResult;
-import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
-import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
-import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataResponse;
-import software.amazon.awssdk.services.cloudwatch.model.SetAlarmStateRequest;
-import software.amazon.awssdk.services.cloudwatch.model.SetAlarmStateResponse;
-import software.amazon.awssdk.services.cloudwatch.model.StandardUnit;
-import software.amazon.awssdk.services.cloudwatch.model.StateValue;
-import software.amazon.awssdk.services.cloudwatch.model.Statistic;
 
 public class AwsSdk2AccessAnalyzer {
 
@@ -55,7 +28,7 @@ public class AwsSdk2AccessAnalyzer {
 				  .build();
 	}
 	
-	public void analyzersList() {
+	public void analyzerList() {
 		
 		System.out.println(String.format("List Access Analyzers"));
 
@@ -66,10 +39,24 @@ public class AwsSdk2AccessAnalyzer {
         List<AnalyzerSummary> list = result.analyzers();
 
         for (var element : list) {
-            System.out.println(String.format("%s %s", element.name(), element.lastResourceAnalyzedAt()));
+            System.out.println(String.format("%s Analyze=%s", element.name(), element.lastResourceAnalyzedAt()));
         }
         
 	}
 	
+	public void analyzerDelete(String name) {
+		
+		System.out.println(String.format("Delete Access Analyzer. Name=%s", name));
+
+		DeleteAnalyzerRequest request = DeleteAnalyzerRequest.builder()
+				.analyzerName(name)
+    			.build();
+		
+		DeleteAnalyzerResponse result = client.deleteAnalyzer(request);
+        
+        System.out.println(String.format("%s", result));
+        
+        
+	}
 	
 }
