@@ -1,19 +1,27 @@
 package demo.aws.modules;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AddCustomAttributesRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminAddUserToGroupRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminConfirmSignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminConfirmSignUpResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminCreateUserResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminDeleteUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminListGroupsForUserRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminListGroupsForUserResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminSetUserPasswordRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminSetUserPasswordResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdateUserAttributesRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminUpdateUserAttributesResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
@@ -164,6 +172,61 @@ public class AwsSdk2Cognito {
         
 	}
 	
+	public static class AsicsCognitoUser {
+		public String name;
+		public String email;
+		public String status;
+		Map<String, String> attributes = Collections.emptyMap(); 
+		@Override
+		public String toString() {
+			return String.format("%s, %s, %s %s]", name, email, status, attributes);
+		}	
+	}
+	
+	public Map<String, AsicsCognitoUser> userPoolListUsersAllV2(String poolId) {
+
+		Map<String, AsicsCognitoUser> users = new TreeMap<>();
+		
+		String paginationToken = null;
+		boolean next = false;
+		do {
+        try {
+        	
+        	ListUsersRequest request = ListUsersRequest.builder()
+        			.userPoolId(poolId)
+        			.limit(60)
+        			.paginationToken(paginationToken)
+        			.build();
+        	ListUsersResponse result = client.listUsers(request);
+            List<UserType> list = result.users();
+
+            for (UserType element : list) {
+            	
+            	AsicsCognitoUser muser = new AsicsCognitoUser();
+            	muser.name = element.username();
+            	muser.status = element.userStatusAsString();
+            	
+            	List<AttributeType> attributes = element.attributes();
+            	Map<String, String> attributeMap = attributes.stream().collect(Collectors.toMap(AttributeType::name, AttributeType::value));
+            	muser.attributes = attributeMap;
+            	muser.email = attributeMap.get("email");
+            	
+                System.out.println(String.format("%s %s", element.username(), element.userStatus()));
+                users.put(element.username(), muser);
+            }
+            
+            paginationToken = result.paginationToken();
+            next = paginationToken != null;
+
+        } catch(CognitoIdentityProviderException e) {
+            System.err.println(e.getMessage());
+        }
+		} while (next);
+
+        return users;
+        
+	}
+	
 	public String userPoolGetUser(String userPoolId, String name) throws CognitoIdentityProviderException {
 
 		System.out.println(String.format("Get Cognito User. User=%s", name));
@@ -265,6 +328,23 @@ public class AwsSdk2Cognito {
 
 	}
 
+	public  void userPoolUserListGroup(String userPoolId, String userName) {
+		
+		System.out.println(String.format("List Cognito User Groups User=%s", userName));
+	
+		AdminListGroupsForUserRequest request = AdminListGroupsForUserRequest.builder()
+				.userPoolId(userPoolId)
+				.username(userName)
+				.build();
+
+		AdminListGroupsForUserResponse response = client.adminListGroupsForUser(request);
+		List<GroupType> elements = response.groups();
+		for (GroupType element : elements) {
+			System.out.println(String.format("   Group=%s", element.groupName()));
+		}
+
+	}
+	
 	public boolean userPoolResendMail(String userPoolId, String name, String password) {
 
 		boolean success = false;
@@ -283,6 +363,59 @@ public class AwsSdk2Cognito {
 
 			AdminCreateUserResponse response = client.adminCreateUser(userRequest);
 			System.out.println(String.format("[ResendMail] User=%s Status=%s", response.user().username(), response.user().userStatus()));
+			success = true;
+		} catch (CognitoIdentityProviderException e) {
+			System.err.println(e.awsErrorDetails().errorMessage());
+		}
+		
+		return success;
+
+	}
+	
+	
+	public boolean userPoolAdminConfirmSignUp(String userPoolId, String name) {
+
+		boolean success = false;
+		
+		try {
+
+			//AttributeType userAttrs = AttributeType.builder().name("email").value(email).build();
+			//AttributeType userAttrs2 = AttributeType.builder().name("email_verified").value("true").build();
+			
+			AdminConfirmSignUpRequest request = AdminConfirmSignUpRequest.builder().userPoolId(userPoolId)
+					.username(name)
+					.userPoolId(userPoolId)
+					.build();
+
+			AdminConfirmSignUpResponse response = client.adminConfirmSignUp(request);
+			System.out.println(String.format("[AdminConfirmSignUpResponse] %s", response));
+			success = true;
+		} catch (CognitoIdentityProviderException e) {
+			System.err.println(e.awsErrorDetails().errorMessage());
+		}
+		
+		return success;
+
+	}
+	
+	public boolean userPoolAdminSetUserPassword(String userPoolId, String name, String password) {
+
+		boolean success = false;
+		
+		try {
+
+			//AttributeType userAttrs = AttributeType.builder().name("email").value(email).build();
+			//AttributeType userAttrs2 = AttributeType.builder().name("email_verified").value("true").build();
+			
+			AdminSetUserPasswordRequest request = AdminSetUserPasswordRequest.builder().userPoolId(userPoolId)
+					.username(name)
+					.userPoolId(userPoolId)
+					.password(password)
+					.permanent(true)
+					.build();
+
+			AdminSetUserPasswordResponse response = client.adminSetUserPassword(request);
+			System.out.println(String.format("[AdminSetUserPasswordResponse] %s", response));
 			success = true;
 		} catch (CognitoIdentityProviderException e) {
 			System.err.println(e.awsErrorDetails().errorMessage());
