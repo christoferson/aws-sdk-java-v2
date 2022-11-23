@@ -3,6 +3,7 @@ package demo.aws.modules;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -21,6 +22,8 @@ import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.Body;
 import software.amazon.awssdk.services.ses.model.Content;
 import software.amazon.awssdk.services.ses.model.Destination;
+import software.amazon.awssdk.services.ses.model.ListIdentitiesRequest;
+import software.amazon.awssdk.services.ses.model.ListIdentitiesResponse;
 import software.amazon.awssdk.services.ses.model.RawMessage;
 import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 import software.amazon.awssdk.services.ses.model.SendEmailResponse;
@@ -37,6 +40,19 @@ public class AwsSdk2Ses {
 				  .credentialsProvider(credentialsProvider)
 				  .region(region)
 				  .build();
+	}
+	
+	public void identityList() {
+		
+		System.out.println("Listing Identities");
+		
+		ListIdentitiesRequest request = ListIdentitiesRequest.builder()
+				.build();
+		ListIdentitiesResponse response = client.listIdentities(request);
+		List<String> elements = response.identities();
+		for (String element : elements) {
+			System.out.println(element);
+		}
 	}
 	
 	public void sendSimple(String sender, String recipient) {
