@@ -6,10 +6,13 @@ import java.util.List;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.eventbridge.EventBridgeClient;
+import software.amazon.awssdk.services.eventbridge.model.Archive;
 import software.amazon.awssdk.services.eventbridge.model.DescribeEventBusRequest;
 import software.amazon.awssdk.services.eventbridge.model.DescribeEventBusResponse;
 import software.amazon.awssdk.services.eventbridge.model.EventBus;
 import software.amazon.awssdk.services.eventbridge.model.EventSource;
+import software.amazon.awssdk.services.eventbridge.model.ListArchivesRequest;
+import software.amazon.awssdk.services.eventbridge.model.ListArchivesResponse;
 import software.amazon.awssdk.services.eventbridge.model.ListEventBusesRequest;
 import software.amazon.awssdk.services.eventbridge.model.ListEventBusesResponse;
 import software.amazon.awssdk.services.eventbridge.model.ListEventSourcesRequest;
@@ -118,6 +121,23 @@ public class AwsSdk2EventBridge {
 	
 	// Archives
 	
+	public void listArchives() {
+
+		System.out.println(String.format("List EventSources"));
+		
+		ListArchivesRequest request = ListArchivesRequest.builder()
+				//.namePrefix(namePrefix)
+				.build();
+
+		ListArchivesResponse result = client.listArchives(request);
+		List<Archive> elements = result.archives();
+		
+		for (Archive element : elements) {
+			System.out.println(String.format("Name=%s State=%s eventSourceArn=%s eventCount=%s", 
+					element.archiveName(), element.stateAsString(), element.eventSourceArn(), element.eventCount()));
+		}
+	}
+	
 	// Replays
 	
 	// APi Destinations / Connections
@@ -125,7 +145,7 @@ public class AwsSdk2EventBridge {
 	
 	// Schemas / Custom Schema Registry
 	
-	public void putEvents(String eventBusName) {
+	public void putEvents(String eventBusName, String detail) {
 
 		System.out.println(String.format("Put Events"));
 		
@@ -134,7 +154,7 @@ public class AwsSdk2EventBridge {
 						.eventBusName(eventBusName)
 						.source("my.company.app")
 						.detailType("user.registered")
-						.detail("{\"foo\":\"bar\"}")
+						.detail(detail)
 						.resources("userid") //optional
 						.time(Instant.now()) //optional
 						.build())
