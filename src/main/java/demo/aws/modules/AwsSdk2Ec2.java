@@ -1,5 +1,7 @@
 package demo.aws.modules;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -19,10 +21,12 @@ import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcEndpointServicesRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcEndpointServicesResponse;
+import software.amazon.awssdk.services.ec2.model.Filter;
 import software.amazon.awssdk.services.ec2.model.Image;
 import software.amazon.awssdk.services.ec2.model.InstanceStatus;
 import software.amazon.awssdk.services.ec2.model.Reservation;
 import software.amazon.awssdk.services.ec2.model.ServiceDetail;
+
 
 
 public class AwsSdk2Ec2 {
@@ -122,8 +126,9 @@ public class AwsSdk2Ec2 {
 	public void vpcEndpointServiceDescribe() {
 		
 		System.out.println(String.format("Describe Vpc Endpoint Services"));
-		
+
 		DescribeVpcEndpointServicesRequest request = DescribeVpcEndpointServicesRequest.builder()
+				.filters(Collections.singletonList(Filter.builder().name("service-type").values("Gateway").build()))
 				.build();
 
 		DescribeVpcEndpointServicesResponse result = client.describeVpcEndpointServices(request);
