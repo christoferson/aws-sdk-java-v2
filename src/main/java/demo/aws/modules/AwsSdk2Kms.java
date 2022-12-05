@@ -268,7 +268,8 @@ public class AwsSdk2Kms {
     		
     	    Cipher cipher = Cipher.getInstance("AES");
     	    cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(plainTextKey.asByteArray(), "AES"));
-    	    plainText = new String(cipher.doFinal(encryptedTextByteArray));
+    	    byte[] plainTextByteArray = cipher.doFinal(encryptedTextByteArray);
+			plainText = new String(plainTextByteArray);
 
     	} catch (Exception e) {
     		e.printStackTrace();

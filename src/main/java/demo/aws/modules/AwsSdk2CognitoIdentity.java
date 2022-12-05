@@ -6,6 +6,8 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentity.CognitoIdentityClient;
 import software.amazon.awssdk.services.cognitoidentity.model.CognitoIdentityException;
+import software.amazon.awssdk.services.cognitoidentity.model.DescribeIdentityRequest;
+import software.amazon.awssdk.services.cognitoidentity.model.DescribeIdentityResponse;
 import software.amazon.awssdk.services.cognitoidentity.model.IdentityDescription;
 import software.amazon.awssdk.services.cognitoidentity.model.IdentityPoolShortDescription;
 import software.amazon.awssdk.services.cognitoidentity.model.ListIdentitiesRequest;
@@ -68,5 +70,18 @@ public class AwsSdk2CognitoIdentity {
         
 	}
 	
-	
+	public void identityDescribe(String identityId) throws CognitoIdentityException {
+
+		System.out.println("Describe Identity");
+		
+    	DescribeIdentityRequest request = DescribeIdentityRequest.builder()
+    			.identityId(identityId)
+    			.build();
+    	
+    	DescribeIdentityResponse result = client.describeIdentity(request);
+    	DescribeIdentityResponse element = result;
+
+        System.out.println(String.format("%s %s", element.identityId(), element.getValueForField("name", String.class)));
+        
+	}
 }
