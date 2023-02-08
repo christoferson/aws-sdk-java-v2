@@ -29,7 +29,7 @@ public class AwsSesSmtpClient {
 
 	}
 
-	public void sendMessage(String from, String to, String body) {
+	public void sendMessage(String from, String to, String subject, String body) {
 		
 		Objects.requireNonNull(from);
 		Objects.requireNonNull(to);
@@ -39,7 +39,7 @@ public class AwsSesSmtpClient {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(from));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-			message.setSubject("Mail Subject " + System.currentTimeMillis());
+			message.setSubject(subject);
 
 			MimeBodyPart mimeBodyPart = new MimeBodyPart();
 			mimeBodyPart.setContent(body, "text/html");
