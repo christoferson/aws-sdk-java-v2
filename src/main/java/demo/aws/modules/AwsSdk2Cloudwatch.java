@@ -33,7 +33,10 @@ import software.amazon.awssdk.services.cloudwatch.model.MetricDataResult;
 import software.amazon.awssdk.services.cloudwatch.model.MetricDatum;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataRequest;
 import software.amazon.awssdk.services.cloudwatch.model.PutMetricDataResponse;
+import software.amazon.awssdk.services.cloudwatch.model.SetAlarmStateRequest;
+import software.amazon.awssdk.services.cloudwatch.model.SetAlarmStateResponse;
 import software.amazon.awssdk.services.cloudwatch.model.StandardUnit;
+import software.amazon.awssdk.services.cloudwatch.model.StateValue;
 import software.amazon.awssdk.services.cloudwatch.model.Statistic;
 
 public class AwsSdk2Cloudwatch {
@@ -157,13 +160,16 @@ public class AwsSdk2Cloudwatch {
         
 	}
 	
-	///
+	/// Alarms
 	
-	public void alarmList() {
+	public void alarmList(String alarmPrefix) {
 		
 		System.out.println(String.format("List CloudWatch Alarms"));
 
 		DescribeAlarmsRequest request = DescribeAlarmsRequest.builder()
+				.alarmNamePrefix(alarmPrefix)
+				//.alarmNames(null)
+				//.alarmTypesWithStrings(null)
     			.build();
 		
 		DescribeAlarmsResponse result = client.describeAlarms(request);
@@ -171,12 +177,28 @@ public class AwsSdk2Cloudwatch {
 		System.out.println(String.format("Metric Alarms"));
 		List<MetricAlarm> list = result.metricAlarms();
         for (MetricAlarm element : list) {
-            System.out.println(String.format("%s %s", element.alarmName(), element.alarmDescription()));
+            System.out.println(String.format("'%s' '%s' '%s' '%s'", element.alarmName(), element.alarmDescription(), element.stateValueAsString(), element.stateReason()));
         }
         System.out.println(String.format("Composite Alarms"));
         for (CompositeAlarm element : result.compositeAlarms()) {
-            System.out.println(String.format("%s %s", element.alarmName(), element.alarmDescription()));
+        	System.out.println(String.format("%s %s %s %s", element.alarmName(), element.alarmDescription(), element.stateValueAsString(), element.stateReason()));
         }
+	}
+	
+	public void alarmSetState(String alarmName, String stateValue, String stateReason) {
+		
+		System.out.println(String.format("Set CloudWatch Alarm State. Alarm=%s State=%s Reason=%s", alarmName, stateValue, stateReason));
+
+		SetAlarmStateRequest request = SetAlarmStateRequest.builder()
+				.alarmName(alarmName)
+				.stateValue(StateValue.fromValue(stateValue))
+				.stateReason(stateReason)
+    			.build();
+		
+		SetAlarmStateResponse result = client.setAlarmState(request);
+        
+		System.out.println(String.format("Alarm State Set", result));
+		
 	}
 	
 }
