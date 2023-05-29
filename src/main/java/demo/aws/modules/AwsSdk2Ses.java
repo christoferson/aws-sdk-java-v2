@@ -21,14 +21,20 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.Body;
 import software.amazon.awssdk.services.ses.model.Content;
+import software.amazon.awssdk.services.ses.model.CreateTemplateRequest;
+import software.amazon.awssdk.services.ses.model.CreateTemplateResponse;
 import software.amazon.awssdk.services.ses.model.Destination;
 import software.amazon.awssdk.services.ses.model.ListIdentitiesRequest;
 import software.amazon.awssdk.services.ses.model.ListIdentitiesResponse;
+import software.amazon.awssdk.services.ses.model.ListTemplatesRequest;
+import software.amazon.awssdk.services.ses.model.ListTemplatesResponse;
 import software.amazon.awssdk.services.ses.model.RawMessage;
 import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 import software.amazon.awssdk.services.ses.model.SendEmailResponse;
 import software.amazon.awssdk.services.ses.model.SendRawEmailRequest;
 import software.amazon.awssdk.services.ses.model.SesException;
+import software.amazon.awssdk.services.ses.model.Template;
+import software.amazon.awssdk.services.ses.model.TemplateMetadata;
 
 public class AwsSdk2Ses {
 
@@ -168,5 +174,20 @@ public class AwsSdk2Ses {
          }
 
     }
-	
+    
+    //
+    
+	public void templatesList() {
+		
+		System.out.println("Listing Templates");
+		
+		ListTemplatesRequest request = ListTemplatesRequest.builder()
+				.build();
+		ListTemplatesResponse response = client.listTemplates(request);
+		List<TemplateMetadata> elements = response.templatesMetadata();
+		for (TemplateMetadata element : elements) {
+			System.out.println(element);
+		}
+	}
+
 }
