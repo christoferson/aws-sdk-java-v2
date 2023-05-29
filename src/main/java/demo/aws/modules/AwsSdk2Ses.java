@@ -24,6 +24,8 @@ import software.amazon.awssdk.services.ses.model.Content;
 import software.amazon.awssdk.services.ses.model.CreateTemplateRequest;
 import software.amazon.awssdk.services.ses.model.CreateTemplateResponse;
 import software.amazon.awssdk.services.ses.model.Destination;
+import software.amazon.awssdk.services.ses.model.GetTemplateRequest;
+import software.amazon.awssdk.services.ses.model.GetTemplateResponse;
 import software.amazon.awssdk.services.ses.model.ListIdentitiesRequest;
 import software.amazon.awssdk.services.ses.model.ListIdentitiesResponse;
 import software.amazon.awssdk.services.ses.model.ListTemplatesRequest;
@@ -32,13 +34,20 @@ import software.amazon.awssdk.services.ses.model.RawMessage;
 import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 import software.amazon.awssdk.services.ses.model.SendEmailResponse;
 import software.amazon.awssdk.services.ses.model.SendRawEmailRequest;
+import software.amazon.awssdk.services.ses.model.SendTemplatedEmailRequest;
 import software.amazon.awssdk.services.ses.model.SesException;
 import software.amazon.awssdk.services.ses.model.Template;
 import software.amazon.awssdk.services.ses.model.TemplateMetadata;
+import software.amazon.awssdk.services.ses.model.UpdateTemplateRequest;
+import software.amazon.awssdk.services.ses.model.UpdateTemplateResponse;
 
 public class AwsSdk2Ses {
 
 	private SesClient client;
+	
+	public SesClient client() {
+		return this.client;
+	}
 	
 	public AwsSdk2Ses(AwsCredentialsProvider credentialsProvider, Region region) {
 		
@@ -99,8 +108,8 @@ public class AwsSdk2Ses {
 	    }
 
 
-  }
-
+   }
+    
 
     public  void sendRawEmail(SesClient client,
                             String sender,
@@ -175,6 +184,7 @@ public class AwsSdk2Ses {
 
     }
     
+
     //
     
 	public void templatesList() {
@@ -190,4 +200,20 @@ public class AwsSdk2Ses {
 		}
 	}
 
+	public void templatesRegister() {
+		
+		System.out.println("Register Template");
+		
+		CreateTemplateRequest request = CreateTemplateRequest.builder()
+				.template(Template.builder()
+						.htmlPart("<b>Foo</b>")
+						.subjectPart("Foo Subject")
+						.templateName("MyTemplate" + System.currentTimeMillis())
+						.build())
+				.build();
+		CreateTemplateResponse response = client.createTemplate(request);
+		System.out.println(response);
+		
+	}
+	
 }
