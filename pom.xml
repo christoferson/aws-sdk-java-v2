@@ -44,6 +44,11 @@
     </dependencyManagement>
     <dependencies>
 
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>url-connection-client</artifactId>
+</dependency>
+
           <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>ec2</artifactId>
@@ -153,6 +158,28 @@
 		    <groupId>software.amazon.awssdk</groupId>
 		    <artifactId>accessanalyzer</artifactId>
 		</dependency>   		
+
+		<dependency>
+		    <groupId>software.amazon.awssdk</groupId>
+		    <artifactId>ssm</artifactId>
+		</dependency>
+		
+<!-- https://mvnrepository.com/artifact/software.amazon.awssdk/opensearchserverless -->
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>opensearchserverless</artifactId>
+    <version>2.19.32</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/software.amazon.awssdk/apache-client -->
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>apache-client</artifactId>
+    <scope>test</scope>
+</dependency>
+
+
+		
         <!--  Others -->
 
 		<!-- https://mvnrepository.com/artifact/software.amazon.dax/amazon-dax-client -->
