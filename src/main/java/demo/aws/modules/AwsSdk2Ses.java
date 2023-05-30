@@ -185,6 +185,38 @@ public class AwsSdk2Ses {
     }
     
 
+    public  void sendTemplatedEmail(SesClient client,
+                            String sender,
+                            String recipient,
+                            String templateName, String templateData
+                            ) {
+    	
+    	Destination destination = Destination.builder()
+                .toAddresses(recipient)
+                .build();
+        
+        try {
+            System.out.println("Attempting to send an templated email through Amazon SES " + "using the AWS SDK for Java...");
+
+        
+             SendTemplatedEmailRequest rawEmailRequest = SendTemplatedEmailRequest.builder()
+            		 //.configurationSetName(bodyHTML)
+            		 .template(templateName)
+            		 .templateData(templateData)
+            		 .destination(destination)
+            		 .source(sender)
+                    .build();
+
+             client.sendTemplatedEmail(rawEmailRequest);
+             
+             System.out.println("Sent");
+
+         } catch (SesException e) {
+            System.err.println(e.awsErrorDetails().errorMessage());
+         }
+
+    }
+    
     //
     
 	public void templatesList() {
@@ -215,5 +247,6 @@ public class AwsSdk2Ses {
 		System.out.println(response);
 		
 	}
+	
 	
 }
