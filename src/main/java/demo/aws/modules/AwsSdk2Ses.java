@@ -248,5 +248,22 @@ public class AwsSdk2Ses {
 		
 	}
 	
+	public void templatesUpdate(String templateName) {
+		
+		System.out.println("Update Template " + templateName);
+		
+		UpdateTemplateRequest request = UpdateTemplateRequest.builder()
+				.template(Template.builder()
+						.templateName(templateName)
+						.subjectPart("Foo Subject" + System.currentTimeMillis())
+						.htmlPart(String.format("<b>Foo-%s</b>", System.currentTimeMillis()))
+						.textPart(String.format("Foo-%s", System.currentTimeMillis()))
+						.build())
+				.build();
+		UpdateTemplateResponse response = client.updateTemplate(request);
+		System.out.println(response);
+		
+	}
+
 	
 }
