@@ -264,6 +264,22 @@ public class AwsSdk2Ses {
 		System.out.println(response);
 		
 	}
-
+	
+	public void templatesGet(String templateName) {
+		
+		System.out.println("Get Template " + templateName);
+		
+		GetTemplateRequest request = GetTemplateRequest.builder()
+				.templateName(templateName)
+				.build();
+		GetTemplateResponse response = client.getTemplate(request);
+		System.out.println(response.template());
+		System.out.println(response.template().templateName());
+		System.out.println(response.template().subjectPart());
+		System.out.println(response.template().htmlPart());
+		System.out.println(response.template().textPart());
+		
+		
+	}
 	
 }
