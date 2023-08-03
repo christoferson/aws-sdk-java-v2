@@ -1,5 +1,8 @@
 package demo.aws.modules;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -23,7 +26,7 @@ public class AwsSdk2Iam {
 	
 	public void generateCredentialReport() {
 
-		System.out.println(String.format("Get generateCredentialReport"));
+		System.out.println(String.format("Generate CredentialReport"));
 		
 //		GetCallerIdentityRequest request = GetCallerIdentityRequest.builder()
 //				.build();
@@ -36,16 +39,23 @@ public class AwsSdk2Iam {
 
 	public void getCredentialReport() {
 
-		System.out.println(String.format("Get GetCredentialReport"));
+		System.out.println(String.format("Get CredentialReport"));
 		
 		GetCredentialReportRequest request = GetCredentialReportRequest.builder()
-				
 				.build();
 
 		GetCredentialReportResponse result = client.getCredentialReport(request);
 		System.out.println(String.format("result=%s", result.generatedTime()));
 		String content = result.content().asString(Charset.forName("UTF-8"));
-		System.out.println(String.format("result.content=%s", content));
+		
+		try (BufferedReader reader = new BufferedReader(new StringReader(content))) {
+			reader.lines().forEach(line -> {
+				System.out.println(String.format("result.content=%s", line));
+			});
+			
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} 
 
 	}
 	
