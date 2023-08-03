@@ -1,10 +1,13 @@
 package demo.aws.modules;
 
+import java.nio.charset.Charset;
+
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.model.GenerateCredentialReportResponse;
-import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
+import software.amazon.awssdk.services.iam.model.GetCredentialReportRequest;
+import software.amazon.awssdk.services.iam.model.GetCredentialReportResponse;
 
 public class AwsSdk2Iam {
 
@@ -18,9 +21,9 @@ public class AwsSdk2Iam {
 				  .build();
 	}
 	
-	public void callerIdentityGet() {
+	public void generateCredentialReport() {
 
-		System.out.println(String.format("Get CallerIdentity"));
+		System.out.println(String.format("Get generateCredentialReport"));
 		
 //		GetCallerIdentityRequest request = GetCallerIdentityRequest.builder()
 //				.build();
@@ -31,6 +34,21 @@ public class AwsSdk2Iam {
 
 	}
 
+	public void getCredentialReport() {
+
+		System.out.println(String.format("Get GetCredentialReport"));
+		
+		GetCredentialReportRequest request = GetCredentialReportRequest.builder()
+				
+				.build();
+
+		GetCredentialReportResponse result = client.getCredentialReport(request);
+		System.out.println(String.format("result=%s", result.generatedTime()));
+		String content = result.content().asString(Charset.forName("UTF-8"));
+		System.out.println(String.format("result.content=%s", content));
+
+	}
 	
+	// UpdateAccessKey 
 	
 }
