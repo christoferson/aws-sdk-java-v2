@@ -11,6 +11,10 @@ import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.model.GenerateCredentialReportResponse;
 import software.amazon.awssdk.services.iam.model.GetCredentialReportRequest;
 import software.amazon.awssdk.services.iam.model.GetCredentialReportResponse;
+import software.amazon.awssdk.services.iam.model.ListAccessKeysRequest;
+import software.amazon.awssdk.services.iam.model.ListAccessKeysResponse;
+import software.amazon.awssdk.services.iam.model.UpdateAccessKeyRequest;
+import software.amazon.awssdk.services.iam.model.UpdateAccessKeyResponse;
 
 public class AwsSdk2Iam {
 
@@ -59,6 +63,22 @@ public class AwsSdk2Iam {
 
 	}
 	
-	// UpdateAccessKey 
+	//Active means that the key can be used for programmatic calls to Amazon Web Services, while Inactive means that the key cannot be used.
+	public void listAccessKeys(String userName) {
+
+		System.out.println(String.format("Get CredentialReport"));
+		
+		ListAccessKeysRequest request = ListAccessKeysRequest.builder()
+				.userName(userName)
+				.build();
+
+		ListAccessKeysResponse result = client.listAccessKeys(request);
+		System.out.println(String.format("result=%s", result));
+		for (var meta : result.accessKeyMetadata()) {
+			System.out.println(meta.accessKeyId());
+		}
+
+	}
+	
 	
 }
