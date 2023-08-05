@@ -62,8 +62,7 @@ public class AwsSdk2Iam {
 		} 
 
 	}
-	
-	//Active means that the key can be used for programmatic calls to Amazon Web Services, while Inactive means that the key cannot be used.
+
 	public void listAccessKeys(String userName) {
 
 		System.out.println(String.format("List AccessKeys"));
@@ -77,6 +76,22 @@ public class AwsSdk2Iam {
 		for (var meta : result.accessKeyMetadata()) {
 			System.out.printf("AccessKey=%s Status=%s CreateDate=%s%n", meta.accessKeyId(), meta.status(), meta.createDate());
 		}
+
+	}
+	
+	//Active means that the key can be used for programmatic calls to Amazon Web Services, while Inactive means that the key cannot be used.
+	public void updateAccessKey(String userName, String accessKeyId, String status) {
+
+		System.out.println(String.format("Get updateAccessKeyRequest"));
+		
+		UpdateAccessKeyRequest request = UpdateAccessKeyRequest.builder()
+				.accessKeyId(accessKeyId)
+				.userName(userName)
+				.status(status)
+				.build();
+
+		UpdateAccessKeyResponse result = client.updateAccessKey(request);
+		System.out.println(String.format("result=%s", result));
 
 	}
 	
