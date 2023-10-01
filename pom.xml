@@ -168,7 +168,12 @@
 		    <groupId>software.amazon.awssdk</groupId>
 		    <artifactId>ssm</artifactId>
 		</dependency>
-		
+
+		<dependency>
+		    <groupId>software.amazon.awssdk</groupId>
+		    <artifactId>kinesis</artifactId>
+		</dependency>
+				
 <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/opensearchserverless -->
 <dependency>
     <groupId>software.amazon.awssdk</groupId>

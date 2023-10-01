@@ -1,0 +1,58 @@
+package demo.aws.modules;
+
+import java.nio.charset.Charset;
+import java.util.List;
+
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.kinesis.KinesisClient;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
+import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
+import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
+import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
+import software.amazon.awssdk.services.kinesis.model.GetShardIteratorResponse;
+import software.amazon.awssdk.services.kinesis.model.PutRecordRequest;
+import software.amazon.awssdk.services.kinesis.model.PutRecordResponse;
+import software.amazon.awssdk.services.kinesis.model.Record;
+import software.amazon.awssdk.services.kinesis.model.Shard;
+import software.amazon.awssdk.services.kinesis.model.ShardIteratorType;
+import software.amazon.awssdk.services.kinesis.model.StreamDescription;
+
+public class AwsSdk2Kinesis {
+
+	private KinesisClient client;
+	
+	public AwsSdk2Kinesis(AwsCredentialsProvider credentialsProvider, Region region) {
+		
+		this.client = KinesisClient.builder()
+				  .credentialsProvider(credentialsProvider)
+				  .region(region)
+				  .build();
+	}
+	
+	public void describeStream(String streamName) {
+
+    	System.out.printf("DescribeStream StreamName=%s... %n", streamName);
+    	
+    	DescribeStreamRequest request = DescribeStreamRequest.builder()
+    			.streamName(streamName)
+                .build();
+
+    	DescribeStreamResponse response = client.describeStream(request);
+    	StreamDescription description = response.streamDescription();
+    	
+    	System.out.printf("Stream.Name=%s %n", description.streamName());
+    	System.out.printf("Stream.Status=%s %n", description.streamStatusAsString());
+    	System.out.printf("Stream.CreationTimestamp=%s %n", description.streamCreationTimestamp());
+        List<Shard> elements = response.streamDescription().shards();
+        for (Shard element : elements) {
+            System.out.println(String.format("Shard ShardID=%s ", 
+            		element.shardId()));
+        }
+        
+	}
+
+	
+}
