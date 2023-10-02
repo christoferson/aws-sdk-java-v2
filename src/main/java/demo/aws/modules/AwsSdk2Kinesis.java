@@ -54,5 +54,24 @@ public class AwsSdk2Kinesis {
         
 	}
 
+	public void putRecord(String streamName, String partitionKey, String data) {
+
+    	System.out.printf("DescribeStream StreamName=%s PartitionKey=%s Data=%s... %n", streamName, partitionKey, data);
+    	
+    	PutRecordRequest request = PutRecordRequest.builder()
+    			.streamName(streamName)
+    			.partitionKey(partitionKey)
+    			.data(SdkBytes.fromUtf8String(data))
+                .build();
+
+    	PutRecordResponse response = client.putRecord(request);
+    	
+    	System.out.printf("Response.ShardId=%s %n", response.shardId());
+    	System.out.printf("Response.SequenceNumber=%s %n", response.sequenceNumber());
+    	System.out.printf("Response.EncryptionType=%s %n", response.encryptionType());
+        
+	}
+	
+
 	
 }
