@@ -72,6 +72,39 @@ public class AwsSdk2Kinesis {
         
 	}
 	
+	public void listRecords(String streamArn, String shardId) {
+
+    	System.out.printf("ListRecords StreamName=%s... %n", streamArn);
+    	
+    	// Get Iterator
+    	
+    	GetShardIteratorRequest itrrequest = GetShardIteratorRequest.builder()
+    			.streamARN(streamArn)
+    			.shardId(shardId)
+    			.shardIteratorType(ShardIteratorType.TRIM_HORIZON)
+                .build();
+
+    	GetShardIteratorResponse itrresponse = client.getShardIterator(itrrequest);
+    	String shardIteratorId = itrresponse.shardIterator();
+    	
+    	System.out.printf("Stream.shardIteratorId=%s %n", shardIteratorId);
+    	
+    	// Get Items
+    	
+    	GetRecordsRequest request = GetRecordsRequest.builder()
+    			.streamARN(streamArn)
+    			.shardIterator(shardIteratorId)
+                .build();
+
+    	GetRecordsResponse response = client.getRecords(request);
+        List<Record> elements = response.records();
+        for (Record element : elements) {
+            String data = element.data().asString(Charset.forName("UTF-8"));
+			System.out.println(String.format("Record sequenceNumber=%s partitionKey=%s Data=%s", 
+            		element.sequenceNumber(), element.partitionKey(), data));
+        }
+
+	}
 
 	
 }
